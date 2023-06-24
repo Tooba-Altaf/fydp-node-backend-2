@@ -5,6 +5,7 @@ const express = require("express")
 const app = express()
 const cookieParser = require("cookie-parser")
 const cors = require("cors")
+const authRouter = require("./routes/authRoutes")
 
 // middleware
 const notFoundMiddleware = require("./middleware/not-found")
@@ -16,6 +17,7 @@ app.use(express.json())
 app.use(cookieParser())
 
 //Define Routes
+app.use("/auth", authRouter)
 
 // not found route and err handler
 app.use(notFoundMiddleware)

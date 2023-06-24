@@ -2,8 +2,14 @@ const CustomError = require("../errors")
 const { isTokenValid } = require("../utils/jwt")
 
 const authenticateUser = async (req, res, next) => {
-	let token = req.headers.authorization
-	if (req.cookies.token) {
+	let token
+	// check header
+	const authHeader = req.headers.authorization
+	if (authHeader) {
+		token = authHeader
+	}
+	// check cookies
+	else if (req.cookies.token) {
 		token = req.cookies.token
 	}
 
@@ -12,10 +18,10 @@ const authenticateUser = async (req, res, next) => {
 	}
 	try {
 		const payload = isTokenValid(token)
-		// Attach the user and his permissions to the req object
+
+		// Attach the user to the req object
 		req.user = {
-			userId: payload.user.userId,
-			role: payload.user.role
+			email: payload.email
 		}
 
 		next()
