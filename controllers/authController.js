@@ -1,3 +1,4 @@
+const { PrismaClient } = require("@prisma/client")
 const { StatusCodes } = require("http-status-codes")
 const bcrypt = require("bcryptjs")
 const crypto = require("crypto")
@@ -9,43 +10,60 @@ const {
 } = require("../utils")
 const { createJWT } = require("../utils")
 const CustomError = require("../errors")
-const client = require("../config/database")
+
+const prisma = new PrismaClient()
 
 const register = async (req, res) => {
 	const { email, password, name, type } = req.body
-	const mailsResults = await client.query(
-		"SELECT email FROM users WHERE email=$1",
-		[email]
-	)
 
-	if (mailsResults.rows.length > 0) {
+	const user = await prisma.users.findFirst({
+		where: {
+			email: email
+		},
+		select: {
+			email: true
+		}
+	})
+
+	if (user?.email) {
 		throw new CustomError.BadRequestError("Email already exists")
 	}
 	let hashedPassword = await bcrypt.hash(password, 8)
 
-	await client.query(
-		"INSERT INTO users ( email, password, name, type) VALUES ($1, $2, $3, $4)",
-		[email, hashedPassword, name, type]
-	)
+	await prisma.users.create({
+		data: {
+			email: email,
+			password: hashedPassword,
+			name: name,
+			type: type
+		}
+	})
 
 	const accessToken = createJWT({ email })
 	res.status(StatusCodes.OK).send({ token: accessToken })
 }
+
 const login = async (req, res) => {
 	const { email, password } = req.body
 
 	if (!email || !password) {
 		throw new CustomError.BadRequestError("Please provide email and password")
 	}
-	const user = await client.query("SELECT * FROM users WHERE email=$1", [email])
 
-	if (!user?.rows?.length) {
+	const user = await prisma.users.findFirst({
+		where: {
+			email: email
+		},
+		select: {
+			email: true,
+			password: true
+		}
+	})
+
+	if (!user?.email) {
 		throw new CustomError.UnauthenticatedError("Invalid Credentials")
 	}
-	const isPasswordCorrect = await bcrypt.compare(
-		password,
-		user?.rows[0]?.password
-	)
+	const isPasswordCorrect = await bcrypt.compare(password, user?.password)
 
 	if (!isPasswordCorrect) {
 		throw new CustomError.UnauthenticatedError("Invalid Credentials")
@@ -59,11 +77,22 @@ const login = async (req, res) => {
 
 const getme = async (req, res) => {
 	const { email } = req.user
-	const user = await client.query("SELECT * FROM users WHERE email=$1", [email])
-	if (!user?.rows?.length) {
+
+	const user = await prisma.users.findFirst({
+		where: {
+			email: email
+		},
+		select: {
+			email: true,
+			name: true,
+			type: true
+		}
+	})
+
+	if (!user?.email) {
 		throw new CustomError.CustomAPIError("There was a problem finding the user")
 	} else {
-		res.status(StatusCodes.OK).send({ user: user?.rows[0] })
+		res.status(StatusCodes.OK).send({ user: user })
 	}
 }
 
@@ -73,15 +102,23 @@ const forgotPassword = async (req, res) => {
 		throw new CustomError.BadRequestError("Please provide valid email")
 	}
 
-	const user = await client.query("SELECT * FROM users WHERE email=$1", [email])
+	const user = await prisma.users.findFirst({
+		where: {
+			email: email
+		},
+		select: {
+			email: true,
+			name: true
+		}
+	})
 
-	if (user?.rows?.length) {
+	if (user?.email) {
 		const passwordToken = crypto.randomBytes(70).toString("hex")
 		// send email
 		const origin = "http://localhost:3000"
 		const a = await sendResetPasswordEmail({
-			name: user?.rows[0]?.name,
-			email: user?.rows[0]?.email,
+			name: user?.name,
+			email: user?.email,
 			token: passwordToken,
 			origin
 		})
@@ -103,7 +140,14 @@ const resetPassword = async (req, res) => {
 	if (!token || !email || !password) {
 		throw new CustomError.BadRequestError("Please provide all values")
 	}
-	const user = await client.query("SELECT * FROM users WHERE email=$1", [email])
+	const user = await prisma.users.findFirst({
+		where: {
+			email: email
+		},
+		select: {
+			email: true
+		}
+	})
 
 	if (user) {
 		const currentDate = new Date()

@@ -1,14 +1,8 @@
-const Pool = require("pg").Pool
-const dotenv = require("dotenv")
+let pg = require("pg")
 
+const dotenv = require("dotenv")
 dotenv.config({ path: "./.env" })
 
-const pool = new Pool({
-	user: process.env.USER,
-	password: process.env.PASSWORD,
-	host: process.env.HOST,
-	port: process.env.DB_PORT,
-	database: process.env.DATABASE
-})
+var client = new pg.Client(process.env.DB_CONFIG_URL)
 
-module.exports = pool
+module.exports = client
