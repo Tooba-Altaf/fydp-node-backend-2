@@ -75,27 +75,6 @@ const login = async (req, res) => {
 	res.status(StatusCodes.OK).send({ token: accessToken })
 }
 
-const getme = async (req, res) => {
-	const { email } = req.user
-
-	const user = await prisma.users.findFirst({
-		where: {
-			email: email
-		},
-		select: {
-			email: true,
-			name: true,
-			type: true
-		}
-	})
-
-	if (!user?.email) {
-		throw new CustomError.CustomAPIError("There was a problem finding the user")
-	} else {
-		res.status(StatusCodes.OK).send({ user: user })
-	}
-}
-
 const forgotPassword = async (req, res) => {
 	const { email } = req.body
 	if (!email) {
@@ -162,14 +141,12 @@ const resetPassword = async (req, res) => {
 			await user.save()
 		}
 	}
-
-	res.send("reset password")
+	res.status(StatusCodes.OK).send("reset password")
 }
 
 module.exports = {
 	register,
 	login,
 	forgotPassword,
-	resetPassword,
-	getme
+	resetPassword
 }

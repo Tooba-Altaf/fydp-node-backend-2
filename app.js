@@ -1,15 +1,17 @@
 require("dotenv").config()
 require("express-async-errors")
-
 const express = require("express")
 const app = express()
 const cookieParser = require("cookie-parser")
 const cors = require("cors")
+
 const authRouter = require("./routes/authRoutes")
+const userhRouter = require("./routes/userRoutes")
 
 const client = require("./config/database")
 
 // middleware
+const { authenticateUser } = require("./middleware/full-auth")
 const notFoundMiddleware = require("./middleware/not-found")
 const errorHandlerMiddleware = require("./middleware/error-handler")
 
@@ -20,6 +22,7 @@ app.use(cookieParser())
 
 //Define Routes
 app.use("/auth", authRouter)
+app.use("/user", authenticateUser, userhRouter)
 
 // not found route and err handler
 app.use(notFoundMiddleware)
