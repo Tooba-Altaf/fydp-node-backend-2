@@ -21,6 +21,25 @@ enum UserType {
 enum UserStatus {
   ACTIVE
   INACTIVE
+  BLOCKED
+}
+
+enum VaccineStatus{
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum DispatchStatus{
+  REQUESTED 
+  DISPATCH
+  RECEIVED
+}
+
+enum Gender{
+  MALE
+  FEMALE
+  OTHER
 }
 
 model users {
@@ -32,10 +51,11 @@ model users {
   license                   String?
   gender                   String?
   type                    UserType                  @default(MANUFACTURER)
-  status                  UserStatus                @default(INACTIVE)
+  status                  UserStatus                @default(ACTIVE)
     createdAt DateTime    @default(now())
   updatedAt DateTime    @default(now()) @updatedAt
   deletedAt DateTime?
-  date_of_birth DateTime? 
+  date_of_birth DateTime?
+  cnic string? 
 
 }
