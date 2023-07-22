@@ -16,18 +16,7 @@ const CustomError = require("../errors");
 const prisma = new PrismaClient();
 
 const register = async (req, res) => {
-  const {
-    email,
-    password,
-    name,
-    type,
-    licence,
-    location,
-    contact,
-    gender,
-    date_of_birth,
-    cnic,
-  } = req.body;
+  const { email, password, name, type, licence, location, contact } = req.body;
 
   const user = await prisma.users.findFirst({
     where: {
@@ -43,37 +32,17 @@ const register = async (req, res) => {
   }
   let hashedPassword = await bcrypt.hash(password, 8);
 
-  if (type == UserType.STAFF) {
-    if (!gender || !date_of_birth || cnic) {
-      throw new CustomError.BadRequestError("Please Enter All Fields");
-    }
-    await prisma.users.create({
-      data: {
-        email: email,
-        password: hashedPassword,
-        name: name,
-        type: type,
-        licence,
-        location,
-        contact,
-        gender,
-        date_of_birth,
-        cnic,
-      },
-    });
-  } else {
-    await prisma.users.create({
-      data: {
-        email: email,
-        password: hashedPassword,
-        name: name,
-        type: type,
-        licence,
-        location,
-        contact,
-      },
-    });
-  }
+  await prisma.users.create({
+    data: {
+      email: email,
+      password: hashedPassword,
+      name: name,
+      type: type,
+      licence,
+      location,
+      contact,
+    },
+  });
 
   const accessToken = createJWT({ email });
   res.status(StatusCodes.OK).send({ token: accessToken });
