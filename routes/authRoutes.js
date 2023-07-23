@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
-
-const { authenticateUser } = require("../middleware/full-auth");
+const { registerManufacturerValidation } = require("../middleware/validation");
 
 const {
   register,
@@ -10,7 +9,7 @@ const {
   resetPassword,
 } = require("../controllers/authController");
 
-router.post("/register", register);
+router.post("/register", registerManufacturerValidation, register);
 router.post("/login", login);
 router.post("/forget-password", forgotPassword);
 router.post("/reset-password", resetPassword);
