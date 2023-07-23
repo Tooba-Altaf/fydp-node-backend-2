@@ -9,7 +9,7 @@ const {
 } = require("../controllers/vaccineController")
 
 router.post("/create", createVaccine)
-router.get("", getVaccines)
+router.get("/", getVaccines)
 router.get("/:id", getVaccineById)
 router.patch("/:id", changeVaccineStatus)
 
