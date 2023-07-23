@@ -1,44 +1,68 @@
-const CustomError = require("../errors")
-const { isTokenValid } = require("../utils/jwt")
+const CustomError = require("../errors");
+const { isTokenValid } = require("../utils/jwt");
+
+const { PrismaClient, UserStatus } = require("@prisma/client");
+const prisma = new PrismaClient();
 
 const authenticateUser = async (req, res, next) => {
-	let token
-	// check header
-	const authHeader = req.headers.authorization
-	if (authHeader) {
-		token = authHeader
-	}
-	// check cookies
-	else if (req.cookies.token) {
-		token = req.cookies.token
-	}
+  let token;
+  // check header
+  const authHeader = req.headers.authorization;
+  if (authHeader) {
+    token = authHeader;
+  }
+  // check cookies
+  else if (req.cookies.token) {
+    token = req.cookies.token;
+  }
 
-	if (!token) {
-		throw new CustomError.UnauthenticatedError("Authentication invalid")
-	}
-	try {
-		const payload = isTokenValid(token)
+  if (!token) {
+    throw new CustomError.UnauthenticatedError("Authentication invalid");
+  }
+  try {
+    const payload = isTokenValid(token);
 
-		// Attach the user to the req object
-		req.user = {
-			email: payload.email
-		}
+    const user = await prisma.users.findFirst({
+      where: {
+        email: payload?.email,
+      },
+      select: {
+        status: true,
+      },
+    });
 
-		next()
-	} catch (error) {
-		throw new CustomError.UnauthenticatedError("Authentication invalid")
-	}
-}
+    if (user?.status != UserStatus.ACTIVE) {
+      if (user?.status == UserStatus.INACTIVE) {
+        throw new CustomError.UnauthenticatedError(
+          "Your Account is not yet approved by Admin"
+        );
+      } else {
+        throw new CustomError.UnauthenticatedError(
+          "Your Account is blocked, Contact Admin"
+        );
+      }
+    }
+
+    // Attach the user to the req object
+    req.user = {
+      email: payload.email,
+    };
+
+    next();
+  } catch (error) {
+    throw new CustomError.UnauthenticatedError("Authentication invalid");
+  }
+};
 
 const authorizeRoles = (...roles) => {
-	return (req, res, next) => {
-		if (!roles.includes(req.user.role)) {
-			throw new CustomError.UnauthorizedError(
-				"Unauthorized to access this route"
-			)
-		}
-		next()
-	}
-}
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      throw new CustomError.UnauthorizedError(
+        "Unauthorized to access this route"
+      );
+    }
+    next();
+  };
+};
 
-module.exports = { authenticateUser, authorizeRoles }
+module.exports = { authenticateUser, authorizeRoles };

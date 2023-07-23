@@ -1,17 +1,19 @@
-const express = require("express")
-const router = express.Router()
-const{registerManufacturerandInstituteValidation,loginValidation}=require("../middleware/validation")
+const express = require("express");
+const router = express.Router();
+const { registerManufacturerValidation } = require("../middleware/validation");
 
-const { authenticateUser } = require("../middleware/full-auth")
+const { authenticateUser } = require("../middleware/full-auth");
 
 const {
-	register,
-	login,
-	forgotPassword
-} = require("../controllers/authController")
+  register,
+  login,
+  forgotPassword,
+  resetPassword,
+} = require("../controllers/authController");
 
-router.post("/register",registerManufacturerandInstituteValidation, register)
-router.post("/login",loginValidation, login)
-router.post("/forget-password", forgotPassword)
+router.post("/register", registerManufacturerValidation, register);
+router.post("/login", login);
+router.post("/forget-password", forgotPassword);
+router.post("/reset-password", resetPassword);
 
-module.exports = router
+module.exports = router;
