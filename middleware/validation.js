@@ -1,6 +1,6 @@
 const {check,validationResult}=require ('express-validator')
 
-exports.registerManufacturerValidation=[
+exports.registerManufacturerandInstituteValidation=[
     check('email')
     .isEmail().withMessage('Invalid email!')
     .isLength({min:6, max:256}).withMessage("Email should be atleast 6 to 256 characters long"),
@@ -42,7 +42,7 @@ exports.loginValidation=[
     check('password').trim().not().isEmpty().withMessage('Password is empty')
     .isLength({min:6,max:20}).withMessage("Password should be 6 to 20 characters long").matches( /^(?=.[a-z])(?=.[A-Z])(?=.\d)(?=.[@$!%#?&])[A-Za-z\d@$!%#?&]{6,20}$/)
 ]
-exports.forgetPasswordVaildation=[
+exports.forgetPasswordValidation=[
     check('email')
     .isEmail().withMessage('Invalid email!')
     .isLength({min:6, max:256}).withMessage("Email should be atleast 6 to 256 characters long"),

@@ -79,12 +79,13 @@ const getUserById = async (req, res) => {
 }
 
 const deleteUserById = async (req, res) => {
+	const { id } = req.params
 	if (!parseInt(id)) {
 		return res
 			.status(StatusCodes.BAD_REQUEST)
 			.send({ error: "invalid values for id" })
 	}
-	const { id } = req.params
+	
 
 	try {
 		const user = await prisma.users.delete({

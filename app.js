@@ -6,7 +6,9 @@ const cookieParser = require("cookie-parser")
 const cors = require("cors")
 
 const authRouter = require("./routes/authRoutes")
-const userhRouter = require("./routes/userRoutes")
+const userRouter = require("./routes/userRoutes")
+const vaccineRouter=require("./routes/vaccineRoutes")
+const {registerManufacturerValidation}=require("./middleware/validation")
 
 const client = require("./config/database")
 
@@ -22,7 +24,8 @@ app.use(cookieParser())
 
 //Define Routes
 app.use("/auth", authRouter)
-app.use("/user", authenticateUser, userhRouter)
+app.use("/user", authenticateUser, userRouter)
+app.use("/vaccine",authenticateUser,vaccineRouter)
 
 // not found route and err handler
 app.use(notFoundMiddleware)
@@ -34,7 +37,7 @@ app.listen(process.env.PORT, function (err) {
 		if (err) {
 			return console.error("could not connect to postgres", err)
 		}
-		console.log("BD connected")
+		console.log("DB connected")
 	})
 	console.log("Server listening on Port", process.env.PORT)
 })

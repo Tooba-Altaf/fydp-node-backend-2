@@ -1,9 +1,9 @@
-const { PrismaClient } = require("@prisma/client");
+const { PrismaClient,UserStatus,UserType } = require("@prisma/client");
 const { StatusCodes } = require("http-status-codes");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 
-import { PrismaClient, UserType, UserStatus } from "@prisma/client";
+//const { UserType, UserStatus }= "@prisma/client";
 
 const {
   sendVerificationEmail,
@@ -12,6 +12,7 @@ const {
 } = require("../utils");
 const { createJWT } = require("../utils");
 const CustomError = require("../errors");
+const { STATUS_CODES } = require("http");
 
 const prisma = new PrismaClient();
 
@@ -32,17 +33,18 @@ const register = async (req, res) => {
   }
   let hashedPassword = await bcrypt.hash(password, 8);
 
-  await prisma.users.create({
+  const newUser=await prisma.users.create({
     data: {
       email: email,
       password: hashedPassword,
       name: name,
       type: type,
-      licence,
-      location,
-      contact,
+      licence:licence,
+      location:location,
+      contact:contact,
     },
   });
+  res.send({data:newUser}).status(StatusCodes.OK)
 
   const accessToken = createJWT({ email });
   res.status(StatusCodes.OK).send({ token: accessToken });
@@ -74,11 +76,11 @@ const login = async (req, res) => {
   if (!isPasswordCorrect) {
     throw new CustomError.UnauthenticatedError("Invalid Credentials");
   }
-  if (user?.status != UserStatus.ACTIVE) {
-    throw new CustomError.UnauthenticatedError(
-      "Your Account is blocked, Contact Admin"
-    );
-  }
+  // if (user?.status != UserStatus.ACTIVE) {
+  //   throw new CustomError.UnauthenticatedError(
+  //     "Your Account is blocked, Contact Admin"
+  //   );
+  // }
   const accessToken = createJWT({ email });
   res.status(StatusCodes.OK).send({ token: accessToken });
 };
