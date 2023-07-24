@@ -1,4 +1,4 @@
-const { PrismaClient } = require("@prisma/client")
+const { PrismaClient, UserType } = require("@prisma/client")
 const { StatusCodes } = require("http-status-codes")
 const CustomError = require("../errors")
 
@@ -21,7 +21,11 @@ const getme = async (req, res) => {
       		contact: true,
 			gender:true,
 			status:true,
-			cnic:true
+			cnic:true,
+			date_of_birth:true,
+			createdAt:true,
+			updatedAt:true,
+			deletedAt:true
 
 		}
 	})
@@ -51,7 +55,11 @@ const getUsers = async (req, res) => {
       		contact: true,
 			  gender:true,
 			  status:true,
-			  cnic:true
+			  cnic:true,
+			  date_of_birth:true,
+			createdAt:true,
+			updatedAt:true,
+			deletedAt:true
 		},
 		take: parseInt(limit),
 		skip: (parseInt(page) - 1) * parseInt(limit)
@@ -86,7 +94,11 @@ const getUserById = async (req, res) => {
       		contact: true,
 			  gender:true,
 			  status:true,
-			  cnic:true
+			  cnic:true,
+			  date_of_birth:true,
+			createdAt:true,
+			updatedAt:true,
+			deletedAt:true
 		}
 	})
 
@@ -121,9 +133,39 @@ const deleteUserById = async (req, res) => {
 	}
 }
 
+const createStaff= async (req,res)=>{
+	//role based authentication to be added
+	const{name,email,cnic,date_of_birth,contact,gender}=req.body;
+	const user = await prisma.users.findFirst({
+		where: {
+		  email: email,
+		},
+		select: {
+		  email: true,
+		},
+	  });
+	
+	  if (user?.email) {
+		throw new CustomError.BadRequestError("Email already exists");
+	  }
+	  const newUser = await prisma.users.create({
+		data: {
+		  email: email,
+		  name: name,
+		  type: UserType.STAFF,
+		  cnic:cnic,
+		  date_of_birth:date_of_birth,
+		  contact: contact,
+		  gender:gender
+		},
+	  });
+	  res.send({message:"Staff created successfully"}).status(StatusCodes.OK)
+}
+
 module.exports = {
 	getme,
 	getUsers,
 	getUserById,
-	deleteUserById
+	deleteUserById,
+	createStaff,
 }

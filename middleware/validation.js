@@ -14,7 +14,7 @@ exports.registerManufacturerandInstituteValidation=[
 
     check('license').trim().not().isEmpty().withMessage("license number is empty").matches(/^[0-9]+$/).isLength({min:9,max:9}).withMessage("Invalid license number"),
     check('location').trim().not().isEmpty().withMessage("location is empty").isLength({min:10}).withMessage("Very short location"),
-    check('contact').trim().not().isEmpty().withMessage(" contact is empty").isLength({min:11}).matches(/^[0-9]+$/).withMessage("Contact should be 11 numbers long"),
+    check('contact').trim().not().isEmpty().withMessage(" contact is empty").isLength({min:11,max:11}).matches(/^[0-9]+$/).withMessage("Contact should be 11 numbers long"),
 ];
 exports.registerStaffValidation=[
     check('email')
