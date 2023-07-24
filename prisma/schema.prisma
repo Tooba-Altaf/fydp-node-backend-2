@@ -48,7 +48,7 @@ model users {
   name          String
   contact       String?
   license       String?
-  gender        String?
+  gender        Gender?
   type          UserType   @default(MANUFACTURER)
   status        UserStatus @default(ACTIVE)
   createdAt     DateTime   @default(now())
