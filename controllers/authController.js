@@ -8,7 +8,7 @@ const CustomError = require("../errors");
 const prisma = new PrismaClient();
 
 const register = async (req, res) => {
-  const { email, password, name, type, licence, location, contact } = req.body;
+  const { email, password, name, type, license, location, contact } = req.body;
 
   const user = await prisma.users.findFirst({
     where: {
@@ -30,7 +30,7 @@ const register = async (req, res) => {
       password: hashedPassword,
       name: name,
       type: type,
-      licence: licence,
+      license: license,
       location: location,
       contact: contact,
     },

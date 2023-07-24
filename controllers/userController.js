@@ -16,7 +16,7 @@ const getme = async (req, res) => {
 			name: true,
 			type: true,
 			id: true,
-			licence: true,
+			license: true,
       		location: true,
       		contact: true,
 
@@ -43,7 +43,7 @@ const getUsers = async (req, res) => {
 			name: true,
 			type: true,
 			id: true,
-			licence: true,
+			license: true,
       		location: true,
       		contact: true,
 		},
@@ -75,7 +75,7 @@ const getUserById = async (req, res) => {
 			name: true,
 			type: true,
 			id: true,
-			licence: true,
+			license: true,
       		location: true,
       		contact: true,
 		}
