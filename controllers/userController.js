@@ -19,6 +19,9 @@ const getme = async (req, res) => {
 			license: true,
       		location: true,
       		contact: true,
+			gender:true,
+			status:true,
+			cnic:true
 
 		}
 	})
@@ -46,6 +49,9 @@ const getUsers = async (req, res) => {
 			license: true,
       		location: true,
       		contact: true,
+			  gender:true,
+			  status:true,
+			  cnic:true
 		},
 		take: parseInt(limit),
 		skip: (parseInt(page) - 1) * parseInt(limit)
@@ -78,6 +84,9 @@ const getUserById = async (req, res) => {
 			license: true,
       		location: true,
       		contact: true,
+			  gender:true,
+			  status:true,
+			  cnic:true
 		}
 	})
 
