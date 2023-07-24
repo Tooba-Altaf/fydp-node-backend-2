@@ -35,7 +35,7 @@ const register = async (req, res) => {
       contact: contact,
     },
   });
-  res.send({ data: newUser }).status(StatusCodes.OK);
+  //res.send({ data: newUser }).status(StatusCodes.OK);
 
   const accessToken = createJWT({ email });
   res.status(StatusCodes.OK).send({ token: accessToken });
