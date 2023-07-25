@@ -1,4 +1,4 @@
-const { PrismaClient, UserType } = require("@prisma/client")
+const { PrismaClient, UserType, UserStatus } = require("@prisma/client")
 const { StatusCodes } = require("http-status-codes")
 const CustomError = require("../errors")
 
@@ -161,11 +161,53 @@ const createStaff= async (req,res)=>{
 	  });
 	  res.send({message:"Staff created successfully"}).status(StatusCodes.OK)
 }
+const changeStatus =async (req,res)=>{
+	//role based authentication
+	const {id}=req.body;
+	const user = await prisma.users.update({
+		where: {
+		  id: id,
+		},
+		data:{
+		status:UserStatus.ACTIVE //can add a check on cnic to see if its not valid, then block the user
+	}
+})
+	if (!user){
+		throw new CustomError.NotFoundError("user of this id is not found")
+	}
+	res.json({messgae:"User status changed to Active "}).status(StatusCodes.OK)	
+	
 
+}
+
+const updateProfile=async(req, res)=>{
+	//check whether the person who is logged in is updating their profile
+const {id}=req.params;
+const{password, contact,email,gender,name}=req.body;
+let hashedPassword = await bcrypt.hash(password, 8);
+const user=await prisma.users.update({
+	where:{
+		id:id
+	},
+	data:{
+		password:hashedPassword,
+		contact:contact,
+		email:email,
+		gender:gender,
+		name:name
+	}
+})
+if (!user){
+	throw new CustomError.NotFoundError("user of this id is not found")
+}
+res.json({message:"User updated successfully"}).status(StatusCodes.OK)
+}
 module.exports = {
 	getme,
 	getUsers,
 	getUserById,
 	deleteUserById,
 	createStaff,
+	changeStatus,
+	updateProfile
 }
