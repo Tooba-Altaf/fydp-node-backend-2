@@ -88,9 +88,7 @@ const login = async (req, res) => {
         "Your Account is not yet approved by Admin"
       );
     } else {
-      throw new CustomError.UnauthenticatedError(
-        "Your Account is blocked, Contact Admin"
-      );
+      throw new CustomError.UnauthenticatedError("Your Account is blocked");
     }
   }
   const accessToken = createJWT({ email });

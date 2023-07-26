@@ -42,13 +42,16 @@ const getme = async (req, res) => {
 };
 
 const getUsers = async (req, res) => {
-  const { type = "INSTITUTE" } = req.body;
-  const { limit = 10, page = 1 } = req.query;
+  const { limit = 10, page = 1, type = "INSTITUTE" } = req.query;
 
+  let whereClause = {};
+  if (type) {
+    whereClause = {
+      type,
+    };
+  }
   const user = await prisma.users.findMany({
-    where: {
-      type: type,
-    },
+    where: whereClause,
     select: {
       email: true,
       name: true,
@@ -70,9 +73,7 @@ const getUsers = async (req, res) => {
   });
 
   const totalUsers = await prisma.users.count({
-    where: {
-      type: type,
-    },
+    where: whereClause,
   });
 
   res.status(StatusCodes.OK).send({ data: user, count: totalUsers });
@@ -108,7 +109,7 @@ const getUserById = async (req, res) => {
   });
 
   if (!user) {
-    throw new CustomError.NotFoundError("invalid request");
+    throw new CustomError.NotFoundError("User not found");
   }
 
   res.status(StatusCodes.OK).send({ data: user });
@@ -130,7 +131,7 @@ const deleteUserById = async (req, res) => {
 
     res.status(StatusCodes.OK).send({ message: "User deleted successfully" });
   } catch (error) {
-    throw new CustomError.NotFoundError("invalid request");
+    throw new CustomError.NotFoundError("User not found");
   }
 };
 
@@ -193,7 +194,7 @@ const changeStatus = async (req, res) => {
   });
 
   if (!userExists) {
-    throw new CustomError.NotFoundError("user of this id is not found");
+    throw new CustomError.NotFoundError("User not found");
   } else {
     const user = await prisma.users.update({
       where: {
