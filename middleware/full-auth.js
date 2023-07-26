@@ -22,12 +22,13 @@ const authenticateUser = async (req, res, next) => {
   try {
     const payload = isTokenValid(token);
 
-    const user = await prisma.users.findFirst({
+    const user = await prisma.users.findUnique({
       where: {
         email: payload?.email,
       },
       select: {
         status: true,
+        type: true,
       },
     });
 
@@ -46,6 +47,7 @@ const authenticateUser = async (req, res, next) => {
     // Attach the user to the req object
     req.user = {
       email: payload.email,
+      type: user.type,
     };
 
     next();
@@ -56,7 +58,7 @@ const authenticateUser = async (req, res, next) => {
 
 const authorizeRoles = (...roles) => {
   return (req, res, next) => {
-    if (!roles.includes(req.user.role)) {
+    if (!roles.includes(req.user.type)) {
       throw new CustomError.UnauthorizedError(
         "Unauthorized to access this route"
       );

@@ -10,7 +10,7 @@ const prisma = new PrismaClient();
 const register = async (req, res) => {
   const { email, password, name, type, license, location, contact } = req.body;
 
-  const user = await prisma.users.findFirst({
+  const user = await prisma.users.findUnique({
     where: {
       email: email,
     },
@@ -34,11 +34,26 @@ const register = async (req, res) => {
       location: location,
       contact: contact,
     },
+    select: {
+      email: true,
+      name: true,
+      type: true,
+      id: true,
+      license: true,
+      location: true,
+      contact: true,
+      gender: true,
+      status: true,
+      cnic: true,
+      date_of_birth: true,
+      createdAt: true,
+      updatedAt: true,
+      deletedAt: true,
+    },
   });
-  //res.send({ data: newUser }).status(StatusCodes.OK);
 
   const accessToken = createJWT({ email });
-  res.status(StatusCodes.OK).send({ token: accessToken });
+  res.status(StatusCodes.CREATED).send({ token: accessToken, user: newUser });
 };
 
 const login = async (req, res) => {
@@ -48,7 +63,7 @@ const login = async (req, res) => {
     throw new CustomError.BadRequestError("Please provide email and password");
   }
 
-  const user = await prisma.users.findFirst({
+  const user = await prisma.users.findUnique({
     where: {
       email: email,
     },
@@ -89,7 +104,7 @@ const forgotPassword = async (req, res) => {
     throw new CustomError.BadRequestError("Please provide valid email");
   }
 
-  const user = await prisma.users.findFirst({
+  const user = await prisma.users.findUnique({
     where: {
       email: email,
     },
@@ -103,7 +118,7 @@ const forgotPassword = async (req, res) => {
   if (user?.email) {
     passwordToken = createTempJWT({ email });
   } else {
-    throw new CustomError.BadRequestError("User not found");
+    throw new CustomError.NotFoundError("User not found");
   }
 
   res.status(StatusCodes.OK).json({ token: passwordToken });
@@ -118,7 +133,7 @@ const resetPassword = async (req, res) => {
 
   const payload = isTokenValid(token);
 
-  const user = await prisma.users.findFirst({
+  const user = await prisma.users.findUnique({
     where: {
       email: email,
     },
@@ -137,9 +152,9 @@ const resetPassword = async (req, res) => {
       },
     });
   } else {
-    throw new CustomError.BadRequestError("User not found");
+    throw new CustomError.NotFoundError("User not found");
   }
-  res.status(StatusCodes.OK).send({ msg: "Password updated successfully" });
+  res.status(StatusCodes.OK).send({ message: "Password updated successfully" });
 };
 
 module.exports = {
