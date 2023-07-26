@@ -43,8 +43,8 @@ enum Gender {
 
 model users {
   id            Int        @id @default(autoincrement())
-  email         String
-  password      String
+  email         String     @unique
+  password      String?
   name          String
   contact       String?
   license       String?
@@ -57,6 +57,7 @@ model users {
   date_of_birth DateTime?
   cnic          String?
   location      String?
+
 }
 
 model vaccine {
