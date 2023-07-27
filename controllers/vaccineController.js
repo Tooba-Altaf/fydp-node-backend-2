@@ -5,26 +5,17 @@ const CustomError = require("../errors");
 const prisma = new PrismaClient();
 
 const createVaccine = async (req, res) => {
-  const { name, doses, info, email } = req.body;
-
-  const manufacturer = await prisma.users.findFirst({
-    where: {
-      email: email,
-    },
-    select: {
-      name: true,
-    },
-  });
+  const { name, doses, info, manufacturer_id } = req.body;
 
   const vaccine = await prisma.vaccine.create({
     data: {
       name: name,
       doses: parseInt(doses),
       info: info,
-      manufacturer_name: manufacturer.name,
+      manufacturer_id: manufacturer_id,
     },
   });
-  res.status(StatusCodes.OK).send({ data: vaccine });
+  res.status(StatusCodes.CREATED).send({ data: vaccine });
 };
 
 const getVaccineById = async (req, res) => {
@@ -43,7 +34,7 @@ const getVaccineById = async (req, res) => {
       doses: true,
       info: true,
       status: true,
-      manufacturer_name: true,
+      manufacturer_id: true,
       id: true,
     },
   });
@@ -56,18 +47,17 @@ const getVaccineById = async (req, res) => {
 };
 
 const getVaccines = async (req, res) => {
-  const { manufacturer_name, status } = req.body;
-  const { limit = 10, page = 1 } = req.query;
+  const { limit = 10, page = 1, manufacturer_id, status } = req.query;
 
   let whereClause = {};
-  if (manufacturer_name && status) {
+  if (manufacturer_id && status) {
     whereClause = {
-      manufacturer_name: manufacturer_name,
+      manufacturer_id: manufacturer_id,
       status: status,
     };
-  } else if (manufacturer_name) {
+  } else if (manufacturer_id) {
     whereClause = {
-      manufacturer_name: manufacturer_name,
+      manufacturer_id: manufacturer_id,
     };
   } else if (status) {
     whereClause = {
@@ -82,7 +72,7 @@ const getVaccines = async (req, res) => {
       doses: true,
       info: true,
       status: true,
-      manufacturer_name: true,
+      manufacturer_id: true,
       id: true,
     },
     take: parseInt(limit),
@@ -93,7 +83,6 @@ const getVaccines = async (req, res) => {
 };
 
 const changeVaccineStatus = async (req, res) => {
-  //have to add role based authentication
   const { status } = req.body;
   const { id } = req.params;
   if (!parseInt(id)) {
