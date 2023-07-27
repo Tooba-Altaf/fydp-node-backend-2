@@ -60,8 +60,8 @@ model users {
   cnic          String?
   location      String?
   institute_id Int? 
-  institute  users   @relation("instituteHasStaff", fields: [institute_id], references: [id])
-  staff user[]   @relation("instituteHasStaff")
+  institute  users?   @relation("instituteHasStaff", fields: [institute_id], references: [id])
+  staff users[]   @relation("instituteHasStaff")
 
   vaccines     vaccine[]
    dispatch dispatch[]
