@@ -41,6 +41,11 @@ enum Gender {
   OTHER
 }
 
+enum SortOrder {
+    ASC 
+    DESC 
+}
+
 
 
 model users {

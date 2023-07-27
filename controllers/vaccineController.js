@@ -47,7 +47,14 @@ const getVaccineById = async (req, res) => {
 };
 
 const getVaccines = async (req, res) => {
-  const { limit = 10, page = 1, manufacturer_id, status } = req.query;
+  const {
+    limit = 10,
+    page = 1,
+    manufacturer_id,
+    status,
+    direction = "DESC",
+    column = "createdAt",
+  } = req.query;
 
   let whereClause = {};
   if (manufacturer_id && status) {
@@ -77,6 +84,11 @@ const getVaccines = async (req, res) => {
     },
     take: parseInt(limit),
     skip: (parseInt(page) - 1) * parseInt(limit),
+    orderBy: [
+      {
+        [column]: direction?.toUpperCase() === "DESC" ? "desc" : "asc",
+      },
+    ],
   });
   const totalVaccines = await prisma.vaccine.count();
   res.status(StatusCodes.OK).send({ data: vaccines, count: totalVaccines });
