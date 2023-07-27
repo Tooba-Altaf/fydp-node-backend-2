@@ -104,9 +104,24 @@ const changeVaccineStatus = async (req, res) => {
   res.status(StatusCodes.OK).send({ data: singleVaccine });
 };
 
+
+const createDispatchVaccine = async (req, res) => {
+  const { vaccine_id,quantity,batch_id ,institute_id} = req.body;
+  for (let i=0;i<quantity;i++){
+  const vaccine = await prisma.dispatch.create({
+    data: {
+      vaccine_id:vaccine_id,
+      batch_id:batch_id,
+      institute_id:institute_id
+    },
+  });
+  res.status(StatusCodes.CREATED).send({ data: vaccine });
+}};
+
 module.exports = {
   createVaccine,
   getVaccineById,
   getVaccines,
   changeVaccineStatus,
+  createDispatchVaccine
 };
