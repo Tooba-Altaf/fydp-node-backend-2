@@ -29,6 +29,7 @@ const authenticateUser = async (req, res, next) => {
       select: {
         status: true,
         type: true,
+        id: true,
       },
     });
 
@@ -48,6 +49,7 @@ const authenticateUser = async (req, res, next) => {
     req.user = {
       email: payload.email,
       type: user.type,
+      id: user.id,
     };
 
     next();

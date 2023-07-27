@@ -19,6 +19,10 @@ router.get("/", getUsers);
 router.get("/:id", getUserById);
 router.delete("/:id", deleteUserById);
 router.post("/create-staff", authorizeRoles(UserType.INSTITUTE), createStaff);
-router.patch("/change-status", authorizeRoles(UserType.ADMIN), changeStatus);
+router.patch(
+  "/change-status",
+  authorizeRoles(UserType.ADMIN, UserType.INSTITUTE),
+  changeStatus
+);
 router.patch("/update-profile", updateProfile);
 module.exports = router;

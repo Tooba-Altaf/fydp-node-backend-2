@@ -178,6 +178,7 @@ const createStaff = async (req, res) => {
 
 const changeStatus = async (req, res) => {
   const { id, status } = req.body;
+  const { type } = req.user;
 
   if (!id || !status) {
     throw new CustomError.BadRequestError("Please provide all required fields");
@@ -191,19 +192,28 @@ const changeStatus = async (req, res) => {
     where: {
       id: parseInt(id),
     },
+    select: {
+      type: true,
+    },
   });
 
   if (!userExists) {
     throw new CustomError.NotFoundError("User not found");
   } else {
-    const user = await prisma.users.update({
-      where: {
-        id: parseInt(id),
-      },
-      data: {
-        status: status,
-      },
-    });
+    if (userExists?.type !== UserType.STAFF && type == UserType.INSTITUTE) {
+      throw new CustomError.UnauthorizedError(
+        "Unauthorized to access this route"
+      );
+    } else {
+      const user = await prisma.users.update({
+        where: {
+          id: parseInt(id),
+        },
+        data: {
+          status: status,
+        },
+      });
+    }
   }
   res.json({ messgae: "User status changed" }).status(StatusCodes.OK);
 };

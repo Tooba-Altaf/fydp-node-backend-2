@@ -52,7 +52,7 @@ const register = async (req, res) => {
     },
   });
 
-  const accessToken = createJWT({ email });
+  const accessToken = createJWT({ email, type, id: newUser?.id });
   res.status(StatusCodes.CREATED).send({ token: accessToken, user: newUser });
 };
 
@@ -71,6 +71,8 @@ const login = async (req, res) => {
       email: true,
       password: true,
       status: true,
+      type: true,
+      id: true,
     },
   });
 
@@ -91,7 +93,7 @@ const login = async (req, res) => {
       throw new CustomError.UnauthenticatedError("Your Account is blocked");
     }
   }
-  const accessToken = createJWT({ email });
+  const accessToken = createJWT({ email, type: user?.type, id: user?.id });
   res.status(StatusCodes.OK).send({ token: accessToken });
 };
 
