@@ -11,9 +11,9 @@ const {
 const { authorizeRoles } = require("../middleware/full-auth");
 const { UserType } = require("@prisma/client");
 
-router.post("/create", createVaccine);
+router.post("/create", authorizeRoles(UserType.MANUFACTURER), createVaccine);
 router.get("/", getVaccines);
 router.get("/:id", getVaccineById);
-router.patch("/:id", authorizeRoles([UserType.ADMIN]), changeVaccineStatus);
+router.patch("/:id", authorizeRoles(UserType.ADMIN), changeVaccineStatus);
 
 module.exports = router;

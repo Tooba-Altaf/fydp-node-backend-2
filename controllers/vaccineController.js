@@ -12,7 +12,7 @@ const createVaccine = async (req, res) => {
       name: name,
       doses: parseInt(doses),
       info: info,
-      manufacturer_id: manufacturer_id,
+      manufacturer_id: parseInt(manufacturer_id),
     },
   });
   res.status(StatusCodes.CREATED).send({ data: vaccine });
