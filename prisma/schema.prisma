@@ -42,11 +42,9 @@ enum Gender {
 }
 
 enum SortOrder {
-    ASC 
-    DESC 
+  ASC
+  DESC
 }
-
-
 
 model users {
   id            Int        @id @default(autoincrement())
@@ -64,47 +62,47 @@ model users {
   date_of_birth DateTime?
   cnic          String?
   location      String?
-  institute_id Int? 
-  institute  users?   @relation("instituteHasStaff", fields: [institute_id], references: [id])
-  staff users[]   @relation("instituteHasStaff")
+  institute_id  Int?
+  institute     users?     @relation("instituteHasStaff", fields: [institute_id], references: [id])
+  staff         users[]    @relation("instituteHasStaff")
 
-  vaccines     vaccine[]
-   dispatch dispatch[]
+  vaccines vaccine[]
+  dispatch dispatch[]
 }
 
 model vaccine {
-  id                Int           @id @default(autoincrement())
-  name              String
-  doses             Int?          @default(1)
-  info              String?
-  status            VaccineStatus @default(PENDING)
-  manufacturer   users @relation(fields: [manufacturer_id], references: [id])
+  id              Int           @id @default(autoincrement())
+  name            String
+  doses           Int?          @default(1)
+  info            String?
+  status          VaccineStatus @default(PENDING)
+  manufacturer    users         @relation(fields: [manufacturer_id], references: [id])
   manufacturer_id Int
-  createdAt         DateTime      @default(now())
-  updatedAt         DateTime      @default(now()) @updatedAt
-  deletedAt         DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @default(now()) @updatedAt
+  deletedAt       DateTime?
 
   dispatch dispatch[]
 }
 
 model civilian {
- id                Int           @id @default(autoincrement())
- cnic String
- name String
+  id            Int        @id @default(autoincrement())
+  cnic          String
+  name          String
   date_of_birth DateTime?
- gender Gender  
- contact       String
- dispatch dispatch[]
+  gender        Gender
+  contact       String
+  dispatch      dispatch[]
 }
 
 model dispatch {
-  id                Int           @id @default(autoincrement())
-   vaccine   vaccine @relation(fields: [vaccine_id], references: [id])
-  vaccine_id Int
- status            DispatchStatus 
-    civilian   civilian @relation(fields: [civilian_id], references: [id])
-  civilian_id Int
- batch_id Int
-   institute   users @relation(fields: [institute_id], references: [id])
+  id           Int            @id @default(autoincrement())
+  vaccine      vaccine        @relation(fields: [vaccine_id], references: [id])
+  vaccine_id   Int
+  status       DispatchStatus @default(REQUESTED)
+  civilian     civilian?      @relation(fields: [civilian_id], references: [id])
+  civilian_id  Int?
+  batch_id     String
+  institute    users          @relation(fields: [institute_id], references: [id])
   institute_id Int
 }

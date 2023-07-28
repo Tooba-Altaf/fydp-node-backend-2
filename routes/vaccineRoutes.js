@@ -6,6 +6,7 @@ const {
   getVaccineById,
   getVaccines,
   changeVaccineStatus,
+  createDispatchVaccine,
 } = require("../controllers/vaccineController");
 
 const { authorizeRoles } = require("../middleware/full-auth");
@@ -15,5 +16,10 @@ router.post("/create", authorizeRoles(UserType.MANUFACTURER), createVaccine);
 router.get("/", getVaccines);
 router.get("/:id", getVaccineById);
 router.patch("/:id", authorizeRoles(UserType.ADMIN), changeVaccineStatus);
+router.post(
+  "/create-dispatch",
+  authorizeRoles(UserType.INSTITUTE),
+  createDispatchVaccine
+);
 
 module.exports = router;
