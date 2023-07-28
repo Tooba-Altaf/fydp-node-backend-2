@@ -1,5 +1,7 @@
 const { PrismaClient } = require("@prisma/client");
 const { StatusCodes } = require("http-status-codes");
+const { v4: uuidv4 } = require("uuid");
+
 const CustomError = require("../errors");
 
 const prisma = new PrismaClient();
@@ -124,39 +126,55 @@ const changeVaccineStatus = async (req, res) => {
   res.status(StatusCodes.OK).send({ data: singleVaccine });
 };
 
-
 const createDispatchVaccine = async (req, res) => {
-  const { vaccine_id,quantity,batch_id ,institute_id} = req.body;
-  for (let i=0;i<quantity;i++){
-  const vaccine = await prisma.dispatch.create({
+  const { vaccines = [] } = req.body;
+  const { id: institute_id } = req.user;
+  const batch_id = uuidv4();
+
+  const vaccinesToInsert = [];
+
+  vaccines.map((item) => {
+    for (let i = 0; i < parseInt(item.quantity); i++) {
+      vaccinesToInsert.push({
+        vaccine_id: item.vaccine_id,
+        batch_id: batch_id,
+        institute_id: institute_id,
+      });
+    }
+  });
+
+  try {
+    if (vaccinesToInsert.length > 0) {
+      const vaccines = await prisma.dispatch.createMany({
+        data: vaccinesToInsert,
+      });
+      res.status(StatusCodes.CREATED).send({ data: vaccines });
+    } else {
+      throw new CustomError.CustomAPIError("Something went wrong");
+    }
+  } catch (error) {
+    throw new CustomError.CustomAPIError("Something went wrong");
+  }
+};
+
+const changeDispatchStatus = async (req, res) => {
+  const { status, batch_id } = req.body;
+  const vaccine = await prisma.dispatch.update({
+    where: {
+      batch_id: batch_id,
+    },
     data: {
-      vaccine_id:vaccine_id,
-      batch_id:batch_id,
-      institute_id:institute_id,
-      civilian_id:null,
+      status: status,
     },
   });
-  res.status(StatusCodes.CREATED).send({ data: vaccine });
-}};
+  if (!vaccine) {
+    throw new CustomError.NotFoundError(
+      "Failed to update dispatched vaccine status"
+    );
+  }
 
-
-const changeDispatchStatus=async(req, res)=>{
-    const {status, batch_id}=req.body;
-    const vaccine=await prisma.dispatch.update({
-      where: {
-        batch_id:batch_id
-      },
-      data:{
-        status:status
-      }
-    })
-    if (!vaccine) {
-      throw new CustomError.NotFoundError("Failed to update dispatched vaccine status");
-    }
-  
-    res.status(StatusCodes.OK).send({ data: singleVaccine });
-
-}
+  res.status(StatusCodes.OK).send({ data: singleVaccine });
+};
 
 module.exports = {
   createVaccine,
@@ -164,5 +182,5 @@ module.exports = {
   getVaccines,
   changeVaccineStatus,
   createDispatchVaccine,
-  changeDispatchStatus
+  changeDispatchStatus,
 };

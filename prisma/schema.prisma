@@ -101,8 +101,8 @@ model dispatch {
   vaccine_id   Int
   status       DispatchStatus @default(REQUESTED)
   civilian     civilian?      @relation(fields: [civilian_id], references: [id])
-  civilian_id  Int
-  batch_id     Int
+  civilian_id  Int?
+  batch_id     String
   institute    users          @relation(fields: [institute_id], references: [id])
   institute_id Int
 }

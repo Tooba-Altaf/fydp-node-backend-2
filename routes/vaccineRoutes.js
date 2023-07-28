@@ -17,7 +17,7 @@ router.get("/", getVaccines);
 router.get("/:id", getVaccineById);
 router.patch("/:id", authorizeRoles(UserType.ADMIN), changeVaccineStatus);
 router.post(
-  "/createDispatch",
+  "/create-dispatch",
   authorizeRoles(UserType.INSTITUTE),
   createDispatchVaccine
 );
