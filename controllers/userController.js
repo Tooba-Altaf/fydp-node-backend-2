@@ -47,9 +47,8 @@ const getUsers = async (req, res) => {
     type,
     direction = "DESC",
     column = "createdAt",
+    status,
   } = req.query;
-
-  const { status } = req.body;
 
   let whereClause = {};
   if (type) {
