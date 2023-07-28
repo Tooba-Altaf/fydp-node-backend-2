@@ -140,12 +140,29 @@ const createDispatchVaccine = async (req, res) => {
 }};
 
 
+const changeDispatchStatus=async(req, res)=>{
+    const {status, batch_id}=req.body;
+    const vaccine=await prisma.dispatch.update({
+      where: {
+        batch_id:batch_id
+      },
+      data:{
+        status:status
+      }
+    })
+    if (!vaccine) {
+      throw new CustomError.NotFoundError("Failed to update dispatched vaccine status");
+    }
+  
+    res.status(StatusCodes.OK).send({ data: singleVaccine });
 
+}
 
 module.exports = {
   createVaccine,
   getVaccineById,
   getVaccines,
   changeVaccineStatus,
-  createDispatchVaccine
+  createDispatchVaccine,
+  changeDispatchStatus
 };
