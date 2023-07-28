@@ -10,6 +10,18 @@ const prisma = new PrismaClient();
 const register = async (req, res) => {
   const { email, password, name, type, license, location, contact } = req.body;
 
+  if (
+    !email ||
+    !password ||
+    !name ||
+    !type ||
+    !license ||
+    !location ||
+    !contact
+  ) {
+    throw new CustomError.BadRequestError("Please provide all required fields");
+  }
+
   const user = await prisma.users.findUnique({
     where: {
       email: email,
@@ -128,7 +140,7 @@ const resetPassword = async (req, res) => {
   const { token, email, password } = req.body;
 
   if (!token || !email || !password) {
-    throw new CustomError.BadRequestError("Please provide all values");
+    throw new CustomError.BadRequestError("Please provide all required fields");
   }
 
   const payload = isTokenValid(token);

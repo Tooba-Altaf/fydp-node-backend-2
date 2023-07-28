@@ -41,6 +41,13 @@ enum Gender {
   OTHER
 }
 
+enum SortOrder {
+    ASC 
+    DESC 
+}
+
+
+
 model users {
   id            Int        @id @default(autoincrement())
   email         String     @unique

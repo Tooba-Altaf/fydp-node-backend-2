@@ -40,9 +40,14 @@ const getme = async (req, res) => {
     res.status(StatusCodes.OK).send({ data: user });
   }
 };
-
 const getUsers = async (req, res) => {
-  const { limit = 10, page = 1, type = "INSTITUTE" } = req.query;
+  const {
+    limit = 10,
+    page = 1,
+    type,
+    direction = "DESC",
+    column = "createdAt",
+  } = req.query;
 
   let whereClause = {};
   if (type) {
@@ -50,26 +55,33 @@ const getUsers = async (req, res) => {
       type,
     };
   }
+
+  const selectClause = {
+    email: true,
+    name: true,
+    type: true,
+    id: true,
+    license: true,
+    location: true,
+    contact: true,
+    gender: true,
+    status: true,
+    cnic: true,
+    date_of_birth: true,
+    createdAt: true,
+    updatedAt: true,
+    deletedAt: true,
+  };
   const user = await prisma.users.findMany({
     where: whereClause,
-    select: {
-      email: true,
-      name: true,
-      type: true,
-      id: true,
-      license: true,
-      location: true,
-      contact: true,
-      gender: true,
-      status: true,
-      cnic: true,
-      date_of_birth: true,
-      createdAt: true,
-      updatedAt: true,
-      deletedAt: true,
-    },
+    select: selectClause,
     take: parseInt(limit),
     skip: (parseInt(page) - 1) * parseInt(limit),
+    orderBy: [
+      {
+        [column]: direction?.toUpperCase() === "DESC" ? "desc" : "asc",
+      },
+    ],
   });
 
   const totalUsers = await prisma.users.count({
