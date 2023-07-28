@@ -112,11 +112,14 @@ const createDispatchVaccine = async (req, res) => {
     data: {
       vaccine_id:vaccine_id,
       batch_id:batch_id,
-      institute_id:institute_id
+      institute_id:institute_id,
+      civilian_id:null,
     },
   });
   res.status(StatusCodes.CREATED).send({ data: vaccine });
 }};
+
+
 
 module.exports = {
   createVaccine,
