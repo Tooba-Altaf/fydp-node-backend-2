@@ -42,11 +42,9 @@ enum Gender {
 }
 
 enum SortOrder {
-    ASC 
-    DESC 
+  ASC
+  DESC
 }
-
-
 
 model users {
   id            Int        @id @default(autoincrement())
@@ -102,7 +100,7 @@ model dispatch {
   vaccine      vaccine        @relation(fields: [vaccine_id], references: [id])
   vaccine_id   Int
   status       DispatchStatus @default(REQUESTED)
-  civilian     civilian       @relation(fields: [civilian_id], references: [id])
+  civilian     civilian?      @relation(fields: [civilian_id], references: [id])
   civilian_id  Int
   batch_id     Int
   institute    users          @relation(fields: [institute_id], references: [id])
