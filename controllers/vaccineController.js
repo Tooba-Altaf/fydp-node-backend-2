@@ -94,7 +94,7 @@ const getVaccines = async (req, res) => {
       },
     ],
   });
-  const totalVaccines = await prisma.vaccine.count();
+  const totalVaccines = await prisma.vaccine.count({ where: whereClause });
   res.status(StatusCodes.OK).send({ data: vaccines, count: totalVaccines });
 };
 
