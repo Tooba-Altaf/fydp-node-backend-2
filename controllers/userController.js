@@ -45,6 +45,7 @@ const getUsers = async (req, res) => {
     limit = 10,
     page = 1,
     type,
+    status,
     direction = "DESC",
     column = "createdAt",
   } = req.query;
@@ -54,6 +55,8 @@ const getUsers = async (req, res) => {
     whereClause = {
       type,
     };
+  } else if (status) {
+    whereClause = { ...whereClause, status };
   }
 
   const selectClause = {
