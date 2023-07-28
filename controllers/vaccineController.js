@@ -7,12 +7,16 @@ const prisma = new PrismaClient();
 const createVaccine = async (req, res) => {
   const { name, doses, info, manufacturer_id } = req.body;
 
+  if (!name || !doses || !info || !manufacturer_id) {
+    throw new CustomError.BadRequestError("Please provide all required fields");
+  }
+
   const vaccine = await prisma.vaccine.create({
     data: {
       name: name,
       doses: parseInt(doses),
       info: info,
-      manufacturer_id: manufacturer_id,
+      manufacturer_id: parseInt(manufacturer_id),
     },
   });
   res.status(StatusCodes.CREATED).send({ data: vaccine });
@@ -47,17 +51,24 @@ const getVaccineById = async (req, res) => {
 };
 
 const getVaccines = async (req, res) => {
-  const { limit = 10, page = 1, manufacturer_id, status } = req.query;
+  const {
+    limit = 10,
+    page = 1,
+    manufacturer_id,
+    status,
+    direction = "DESC",
+    column = "createdAt",
+  } = req.query;
 
   let whereClause = {};
   if (manufacturer_id && status) {
     whereClause = {
-      manufacturer_id: manufacturer_id,
+      manufacturer_id: parseInt(manufacturer_id),
       status: status,
     };
   } else if (manufacturer_id) {
     whereClause = {
-      manufacturer_id: manufacturer_id,
+      manufacturer_id: parseInt(manufacturer_id),
     };
   } else if (status) {
     whereClause = {
@@ -77,8 +88,13 @@ const getVaccines = async (req, res) => {
     },
     take: parseInt(limit),
     skip: (parseInt(page) - 1) * parseInt(limit),
+    orderBy: [
+      {
+        [column]: direction?.toUpperCase() === "DESC" ? "desc" : "asc",
+      },
+    ],
   });
-  const totalVaccines = await prisma.vaccine.count();
+  const totalVaccines = await prisma.vaccine.count({ where: whereClause });
   res.status(StatusCodes.OK).send({ data: vaccines, count: totalVaccines });
 };
 
@@ -87,6 +103,10 @@ const changeVaccineStatus = async (req, res) => {
   const { id } = req.params;
   if (!parseInt(id)) {
     throw new CustomError.BadRequestError("invalid request");
+  }
+
+  if (!status) {
+    throw new CustomError.BadRequestError("Please provide all required fields");
   }
 
   const singleVaccine = await prisma.vaccine.update({
