@@ -7,6 +7,10 @@ const prisma = new PrismaClient();
 const createVaccine = async (req, res) => {
   const { name, doses, info, manufacturer_id } = req.body;
 
+  if (!name || !doses || !info || !manufacturer_id) {
+    throw new CustomError.BadRequestError("Please provide all required fields");
+  }
+
   const vaccine = await prisma.vaccine.create({
     data: {
       name: name,
@@ -59,12 +63,12 @@ const getVaccines = async (req, res) => {
   let whereClause = {};
   if (manufacturer_id && status) {
     whereClause = {
-      manufacturer_id: manufacturer_id,
+      manufacturer_id: parseInt(manufacturer_id),
       status: status,
     };
   } else if (manufacturer_id) {
     whereClause = {
-      manufacturer_id: manufacturer_id,
+      manufacturer_id: parseInt(manufacturer_id),
     };
   } else if (status) {
     whereClause = {
@@ -99,6 +103,10 @@ const changeVaccineStatus = async (req, res) => {
   const { id } = req.params;
   if (!parseInt(id)) {
     throw new CustomError.BadRequestError("invalid request");
+  }
+
+  if (!status) {
+    throw new CustomError.BadRequestError("Please provide all required fields");
   }
 
   const singleVaccine = await prisma.vaccine.update({
