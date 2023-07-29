@@ -73,12 +73,13 @@ const getVaccines = async (req, res) => {
   const vaccines = await prisma.vaccine.findMany({
     where: whereClause,
     select: {
+      id: true,
       name: true,
       doses: true,
       info: true,
       status: true,
       manufacturer_id: true,
-      id: true,
+      manufacturer: { select: { name: true } }, // Include the related manufacturer's name
     },
     take: parseInt(limit),
     skip: (parseInt(page) - 1) * parseInt(limit),
@@ -88,7 +89,9 @@ const getVaccines = async (req, res) => {
       },
     ],
   });
+
   const totalVaccines = await prisma.vaccine.count({ where: whereClause });
+
   res.status(StatusCodes.OK).send({ data: vaccines, count: totalVaccines });
 };
 
