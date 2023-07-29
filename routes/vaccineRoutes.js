@@ -7,11 +7,13 @@ const {
   getVaccines,
   changeVaccineStatus,
   createDispatchVaccine,
+  getDispatchVaccines,
 } = require("../controllers/vaccineController");
 
 const { authorizeRoles } = require("../middleware/full-auth");
 const { UserType } = require("@prisma/client");
 
+router.get("/dispatch-records", getDispatchVaccines);
 router.post("/create", authorizeRoles(UserType.MANUFACTURER), createVaccine);
 router.get("/", getVaccines);
 router.get("/:id", getVaccineById);
