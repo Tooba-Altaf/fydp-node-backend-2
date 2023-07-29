@@ -52,11 +52,10 @@ const getUsers = async (req, res) => {
 
   let whereClause = {};
   if (type) {
-    whereClause = {
-      type,
-    };
-  } else if (status) {
-    whereClause = { ...whereClause, status };
+    whereClause.type = type;
+  }
+  if (status) {
+    whereClause.status = status;
   }
 
   const selectClause = {
