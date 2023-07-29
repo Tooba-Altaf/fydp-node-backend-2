@@ -277,9 +277,7 @@ const updateProfile = async (req, res) => {
       },
     });
 
-    res
-      .json({ message: "User updated successfully", user })
-      .status(StatusCodes.OK);
+    res.json({ data: user }).status(StatusCodes.OK);
   } catch (error) {
     throw new CustomError.CustomAPIError("Failed to delete user");
   }
