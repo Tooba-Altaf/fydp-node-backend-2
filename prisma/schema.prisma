@@ -87,7 +87,7 @@ model vaccine {
 
 model civilian {
   id            Int        @id @default(autoincrement())
-  cnic          String
+  cnic          String     @unique
   name          String
   date_of_birth DateTime?
   gender        Gender

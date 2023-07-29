@@ -8,7 +8,7 @@ createCivilianVaccineRecord,
 getCivilian
 }=require("../controllers/civilianController");
 
-router.post("/enterCivilianRecord", authorizeRoles(UserType.STAFF), createCivilianVaccineRecord)
+router.post("/enterCivilianRecord", createCivilianVaccineRecord)
 router.get("/getCivilian", getCivilian)
 
 

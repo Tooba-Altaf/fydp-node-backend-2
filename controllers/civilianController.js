@@ -5,56 +5,40 @@ const CustomError = require("../errors");
 const prisma = new PrismaClient();
 
 const createCivilianVaccineRecord=async(req,res)=>{
-const {cnic,name,gender,contact,date_of_birth,dispatch}=req.body;
-const civilian=await prisma.civilian.update({
+    //have to add condition that only received vaccines can be entered in civilian record
+const {cnic,name,gender,contact,date_of_birth,dispatch_id}=req.body;
+ let civilian;
+civilian=await prisma.civilian.findUnique({
     where:{
         cnic:cnic
     } ,
-    data:{
-        dispatch:{
-            create:dispatch,
-        }
-    },
     select:{
         cnic:true,
-        name:true,
-        gender:true,
-        contact:true,
-        date_of_birth:true,
-        dispatch:true
+       id:true,
 
     }
 })
-res.status(StatusCodes.OK).send({ data: civilian });
 if (!civilian){
-const newCivilian=await prisma.civilian.create({
+civilian=await prisma.civilian.create({
     data:{
       cnic:cnic,
       name:name,
       gender:gender,
       contact:contact ,
       date_of_birth:date_of_birth,
-      dispatch:{create:dispatch}
     },
     select:{
         cnic:true,
-        name:true,
-        gender:true,
-        contact:true,
-        date_of_birth:true,
-        dispatch:true
-
+        id:true,
     }
-})
-
-res.status(StatusCodes.OK).send({ data: newCivilian });
-if (civilian||newCivilian){
+})}
+if (civilian){
     const updateDispatch=await prisma.dispatch.update({
         where:{
-            id:civilian.dispatch.id || newCivilian.dispatch.id
+            id:dispatch_id
         },
         data:{
-            civilian_id:civilian.id || newCivilian.civilian.id
+            civilian_id:civilian.id 
            },
         select:{
             id:true,
@@ -65,11 +49,9 @@ if (civilian||newCivilian){
     })
     res.status(StatusCodes.OK).send({ data: updateDispatch });
 }
-}else {
+else {
     throw new CustomError.CustomAPIError("Something went wrong");
   }
-
-
 }
 
 const getCivilian=async(req,res)=>{
@@ -79,12 +61,24 @@ const getCivilian=async(req,res)=>{
             cnic:cnic
         },select:{
             id:true,
-            name:true,
-            date_of_birth:true,
-            dispatch:true
         }
     })
-    res.status(StatusCodes.OK).send({ data: civilianRecord });
+    if (!civilianRecord) {
+        throw new CustomError.NotFoundError("invalid request");
+      }
+    const dispatchRecord=await prisma.dispatch.findMany({
+        where:{
+            civilian_id:civilianRecord.id},
+        // ,select:{
+        //     id:true,
+        //     batch_id:true,
+        //     vaccine_id:true,
+        //     civilian_id:true,}
+            include:{vaccine:true}
+        
+    })
+    res.status(StatusCodes.OK).send({ data: dispatchRecord });
+
 
 }
 module.exports={
