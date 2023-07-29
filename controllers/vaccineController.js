@@ -173,7 +173,7 @@ const changeDispatchStatus = async (req, res) => {
 };
 
 const getDispatchVaccines = async (req, res) => {
-  const { id } = req.user;
+  const { id ,type} = req.user;
   const { institute_id } = req.params;
 
   let whereClause = {};
