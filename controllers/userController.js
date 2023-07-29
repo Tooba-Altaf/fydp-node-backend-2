@@ -29,6 +29,8 @@ const getme = async (req, res) => {
       createdAt: true,
       updatedAt: true,
       deletedAt: true,
+      institute_id: true,
+      institute: { select: { name: true, id: true } },
     },
   });
 
@@ -73,6 +75,8 @@ const getUsers = async (req, res) => {
     createdAt: true,
     updatedAt: true,
     deletedAt: true,
+    institute: { select: { name: true, id: true } },
+    institute_id: true,
   };
   const user = await prisma.users.findMany({
     where: whereClause,
@@ -119,6 +123,8 @@ const getUserById = async (req, res) => {
       createdAt: true,
       updatedAt: true,
       deletedAt: true,
+      institute: { select: { name: true, id: true } },
+      institute_id: true,
     },
   });
 
@@ -150,8 +156,17 @@ const deleteUserById = async (req, res) => {
 };
 
 const createStaff = async (req, res) => {
-  const { name, email, cnic, date_of_birth, contact, gender } = req.body;
-  if (!email || !name || !cnic || !date_of_birth || !contact || !gender) {
+  const { name, email, cnic, date_of_birth, contact, gender, institute_id } =
+    req.body;
+  if (
+    !email ||
+    !name ||
+    !cnic ||
+    !date_of_birth ||
+    !contact ||
+    !gender ||
+    !institute_id
+  ) {
     throw new CustomError.BadRequestError("Please provide all required fields");
   }
   const user = await prisma.users.findUnique({
@@ -176,6 +191,7 @@ const createStaff = async (req, res) => {
       contact: contact,
       gender: gender,
       status: UserStatus.ACTIVE,
+      institute_id: institute_id,
     },
   });
   // send email

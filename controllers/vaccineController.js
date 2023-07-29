@@ -42,6 +42,7 @@ const getVaccineById = async (req, res) => {
       status: true,
       manufacturer_id: true,
       id: true,
+      manufacturer: { select: { name: true } },
     },
   });
 
