@@ -69,12 +69,12 @@ const getCivilian=async(req,res)=>{
     const dispatchRecord=await prisma.dispatch.findMany({
         where:{
             civilian_id:civilianRecord.id},
-        // ,select:{
-        //     id:true,
-        //     batch_id:true,
-        //     vaccine_id:true,
-        //     civilian_id:true,}
-            include:{vaccine:true}
+        select:{
+            id:true,
+            batch_id:true,
+            vaccine_id:true,
+            vaccine:{select:{name:true,doses:true,manufacturer_id:true,manufacturer:{select:{name:true}}}},
+            civilian_id:true,}
         
     })
     res.status(StatusCodes.OK).send({ data: dispatchRecord });
