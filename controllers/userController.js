@@ -60,8 +60,8 @@ const getUsers = async (req, res) => {
   if (status) {
     whereClause.status = status;
   }
-  if (institute_id) {
-    whereClause.institute_id = institute_id;
+  if (parseInt(institute_id)) {
+    whereClause.institute_id = parseInt(institute_id);
   }
 
   const selectClause = {
@@ -169,7 +169,7 @@ const createStaff = async (req, res) => {
     !date_of_birth ||
     !contact ||
     !gender ||
-    !institute_id
+    !parseInt(institute_id)
   ) {
     throw new CustomError.BadRequestError("Please provide all required fields");
   }
@@ -195,7 +195,7 @@ const createStaff = async (req, res) => {
       contact: contact,
       gender: gender,
       status: UserStatus.ACTIVE,
-      institute_id: institute_id,
+      institute_id: parseInt(institute_id),
     },
   });
   // send email
