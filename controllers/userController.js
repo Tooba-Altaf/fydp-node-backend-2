@@ -50,6 +50,7 @@ const getUsers = async (req, res) => {
     direction = "DESC",
     column = "createdAt",
     status,
+    institute_id,
   } = req.query;
 
   let whereClause = {};
@@ -58,6 +59,9 @@ const getUsers = async (req, res) => {
   }
   if (status) {
     whereClause.status = status;
+  }
+  if (institute_id) {
+    whereClause.institute_id = institute_id;
   }
 
   const selectClause = {
