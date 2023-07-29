@@ -178,6 +178,81 @@ const changeDispatchStatus = async (req, res) => {
   res.status(StatusCodes.OK).send({ data: vaccine });
 };
 
+const getDispatchVaccines = async (req, res) => {
+  const { id: institute_id } = req.user;
+
+  try {
+    const vaccines = await prisma.dispatch.groupBy({
+      by: ["batch_id", "vaccine_id", "institute_id"],
+      where: {
+        institute_id: institute_id,
+      },
+      _count: {
+        institute_id: true,
+        vaccine_id: true,
+      },
+    });
+
+    const result = await Promise.all(
+      vaccines.map(async (v) => {
+        const vaccineInfo = await prisma.vaccine.findUnique({
+          where: { id: v.vaccine_id },
+          select: { name: true },
+        });
+
+        const instituteInfo = await prisma.users.findUnique({
+          where: { id: v.institute_id },
+          select: { name: true },
+        });
+
+        return {
+          batch_id: v.batch_id,
+          vaccine_id: v.vaccine_id,
+          institute_id: v.institute_id,
+          vaccineName: vaccineInfo?.name || null,
+          instituteName: instituteInfo?.name || null,
+          count: v._count.vaccine_id, // The count for each vaccine_id
+        };
+      })
+    );
+
+    const formattedData = {};
+
+    result.forEach((item) => {
+      const {
+        batch_id,
+        vaccine_id,
+        institute_id,
+        vaccineName,
+        instituteName,
+        count,
+      } = item;
+
+      if (!formattedData[batch_id]) {
+        formattedData[batch_id] = {
+          batch_id: batch_id,
+          institute_id: institute_id,
+          instituteName: instituteName,
+          vaccines: [],
+        };
+      }
+
+      formattedData[batch_id].vaccines.push({
+        vaccine_id: vaccine_id,
+        vaccineName: vaccineName,
+        count: count,
+      });
+    });
+
+    const finalData = Object.values(formattedData);
+
+    res.status(StatusCodes.OK).send({ data: finalData });
+  } catch (error) {
+    throw new CustomError.CustomAPIError(error);
+  }
+};
+
+
 module.exports = {
   createVaccine,
   getVaccineById,
@@ -185,4 +260,5 @@ module.exports = {
   changeVaccineStatus,
   createDispatchVaccine,
   changeDispatchStatus,
+  getDispatchVaccines
 };
