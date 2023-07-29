@@ -7,6 +7,7 @@ const CustomError = require("../errors");
 const prisma = new PrismaClient();
 
 const createVaccine = async (req, res) => {
+  
   const { name, doses, info, manufacturer_id } = req.body;
 
   if (!name || !doses || !info || !manufacturer_id) {
@@ -173,7 +174,7 @@ const changeDispatchStatus = async (req, res) => {
     );
   }
 
-  res.status(StatusCodes.OK).send({ data: singleVaccine });
+  res.status(StatusCodes.OK).send({ data: vaccine });
 };
 
 module.exports = {

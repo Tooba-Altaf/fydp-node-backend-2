@@ -21,5 +21,5 @@ router.post(
   authorizeRoles(UserType.INSTITUTE),
   createDispatchVaccine
 );
-
+router.patch("/changeDispatchStatus",authorizeRoles(UserType.INSTITUTE|| UserType.MANUFACTURER),createDispatchVaccine)
 module.exports = router;
