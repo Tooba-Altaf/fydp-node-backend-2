@@ -259,6 +259,22 @@ const updateProfile = async (req, res) => {
         email: email,
       },
       data: updateData,
+      select: {
+        email: true,
+        name: true,
+        type: true,
+        id: true,
+        license: true,
+        location: true,
+        contact: true,
+        gender: true,
+        status: true,
+        cnic: true,
+        date_of_birth: true,
+        createdAt: true,
+        updatedAt: true,
+        deletedAt: true,
+      },
     });
 
     res
