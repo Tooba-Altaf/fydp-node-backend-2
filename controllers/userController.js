@@ -175,6 +175,7 @@ const createStaff = async (req, res) => {
       date_of_birth: new Date(date_of_birth),
       contact: contact,
       gender: gender,
+      status: UserStatus.ACTIVE,
     },
   });
   // send email
