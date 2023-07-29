@@ -137,17 +137,17 @@ const forgotPassword = async (req, res) => {
 };
 
 const resetPassword = async (req, res) => {
-  const { token, email, password } = req.body;
+  const { token, password } = req.body;
 
-  if (!token || !email || !password) {
-    throw new CustomError.BadRequestError("Please provide all required fields");
+  if (!token || !password) {
+    throw new CustomError.BadRequestError("Invalid request");
   }
 
   const payload = isTokenValid(token);
 
   const user = await prisma.users.findUnique({
     where: {
-      email: email,
+      email: payload?.email,
     },
     select: {
       email: true,
