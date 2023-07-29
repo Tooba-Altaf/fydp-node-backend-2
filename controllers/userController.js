@@ -52,11 +52,10 @@ const getUsers = async (req, res) => {
 
   let whereClause = {};
   if (type) {
-    whereClause = {
-      type,
-    };
-  } else if (status) {
-    whereClause = { ...whereClause, status };
+    whereClause.type = type;
+  }
+  if (status) {
+    whereClause.status = status;
   }
 
   const selectClause = {
@@ -277,9 +276,7 @@ const updateProfile = async (req, res) => {
       },
     });
 
-    res
-      .json({ message: "User updated successfully", user })
-      .status(StatusCodes.OK);
+    res.json({ data: user }).status(StatusCodes.OK);
   } catch (error) {
     throw new CustomError.CustomAPIError("Failed to delete user");
   }

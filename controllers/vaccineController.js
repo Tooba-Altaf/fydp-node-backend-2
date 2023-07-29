@@ -63,19 +63,11 @@ const getVaccines = async (req, res) => {
   } = req.query;
 
   let whereClause = {};
-  if (manufacturer_id && status) {
-    whereClause = {
-      manufacturer_id: parseInt(manufacturer_id),
-      status: status,
-    };
-  } else if (manufacturer_id) {
-    whereClause = {
-      manufacturer_id: parseInt(manufacturer_id),
-    };
-  } else if (status) {
-    whereClause = {
-      status: status,
-    };
+  if (manufacturer_id) {
+    whereClause.manufacturer_id = parseInt(manufacturer_id);
+  }
+  if (status) {
+    whereClause.status = status;
   }
 
   const vaccines = await prisma.vaccine.findMany({
