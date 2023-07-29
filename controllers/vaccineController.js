@@ -1,4 +1,4 @@
-const { PrismaClient } = require("@prisma/client");
+const { PrismaClient, UserType } = require("@prisma/client");
 const { StatusCodes } = require("http-status-codes");
 const { v4: uuidv4 } = require("uuid");
 
@@ -173,14 +173,21 @@ const changeDispatchStatus = async (req, res) => {
 };
 
 const getDispatchVaccines = async (req, res) => {
-  const { id: institute_id } = req.user;
+  const { id } = req.user;
+  const { institute_id } = req.params;
+
+  let whereClause = {};
+  if (type === UserType.INSTITUTE) {
+    whereClause.institute_id = parseInt(id);
+  }
+  if (institute_id) {
+    whereClause.institute_id = parseInt(institute_id);
+  }
 
   try {
     const vaccines = await prisma.dispatch.groupBy({
       by: ["batch_id", "vaccine_id", "institute_id"],
-      where: {
-        institute_id: institute_id,
-      },
+      where: whereClause,
       _count: {
         institute_id: true,
         vaccine_id: true,
