@@ -206,9 +206,9 @@ const getDispatchVaccines = async (req, res) => {
         "batch_id",
         "vaccine_id",
         "institute_id",
-        "request_date",
-        "dispatch_date",
-        "receive_date",
+        // "request_date",
+        // "dispatch_date",
+        // "receive_date",
       ],
       where: whereClause,
       _count: {
@@ -238,9 +238,9 @@ const getDispatchVaccines = async (req, res) => {
           vaccineInfo: vaccineInfo,
           instituteName: instituteInfo?.name || null,
           count: v._count.vaccine_id,
-          request_date: v.request_date || null,
-          dispatch_date: v.dispatch_date || null,
-          receive_date: v.receive_date || null,
+          // request_date: v.request_date || null,
+          // dispatch_date: v.dispatch_date || null,
+          // receive_date: v.receive_date || null,
         };
       })
     );
@@ -255,9 +255,9 @@ const getDispatchVaccines = async (req, res) => {
         vaccineInfo,
         instituteName,
         count,
-        request_date,
-        dispatch_date,
-        receive_date,
+        // request_date,
+        // dispatch_date,
+        // receive_date,
       } = item;
 
       if (!formattedData[batch_id]) {
@@ -265,9 +265,9 @@ const getDispatchVaccines = async (req, res) => {
           batch_id: batch_id,
           institute_id: institute_id,
           instituteName: instituteName,
-          request_date,
-          dispatch_date,
-          receive_date,
+          // request_date,
+          // dispatch_date,
+          // receive_date,
           vaccines: [],
         };
       }
