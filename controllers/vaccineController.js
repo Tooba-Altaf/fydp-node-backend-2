@@ -169,7 +169,7 @@ const changeDispatchStatus = async (req, res) => {
     );
   }
 
-  res.status(StatusCodes.OK).send({ data: singleVaccine });
+  res.status(StatusCodes.OK).send({ data: vaccine });
 };
 
 const getDispatchVaccines = async (req, res) => {
