@@ -195,17 +195,23 @@ const getDispatchVaccines = async (req, res) => {
     };
   }
   if (parseInt(institute_id)) {
-    whereClause.institute_id = institute_id;
+    whereClause.institute_id = parseInt(institute_id);
   }
   if (status) {
     whereClause.status = status;
   }
   try {
     const vaccines = await prisma.dispatch.groupBy({
-      by: ["batch_id", "vaccine_id", "institute_id"],
+      by: [
+        "batch_id",
+        "vaccine_id",
+        "institute_id",
+        "request_date",
+        "dispatch_date",
+        "receive_date",
+      ],
       where: whereClause,
       _count: {
-        institute_id: true,
         vaccine_id: true,
       },
     });
@@ -231,7 +237,10 @@ const getDispatchVaccines = async (req, res) => {
           institute_id: v.institute_id,
           vaccineInfo: vaccineInfo,
           instituteName: instituteInfo?.name || null,
-          count: v._count.vaccine_id, // The count for each vaccine_id
+          count: v._count.vaccine_id,
+          request_date: v.request_date || null,
+          dispatch_date: v.dispatch_date || null,
+          receive_date: v.receive_date || null,
         };
       })
     );
@@ -246,6 +255,9 @@ const getDispatchVaccines = async (req, res) => {
         vaccineInfo,
         instituteName,
         count,
+        request_date,
+        dispatch_date,
+        receive_date,
       } = item;
 
       if (!formattedData[batch_id]) {
@@ -253,6 +265,9 @@ const getDispatchVaccines = async (req, res) => {
           batch_id: batch_id,
           institute_id: institute_id,
           instituteName: instituteName,
+          request_date,
+          dispatch_date,
+          receive_date,
           vaccines: [],
         };
       }
