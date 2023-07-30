@@ -199,7 +199,10 @@ const getDispatchVaccines = async (req, res) => {
       vaccines.map(async (v) => {
         const vaccineInfo = await prisma.vaccine.findUnique({
           where: { id: v.vaccine_id },
-          select: { name: true, manufacturer: true },
+          select: {
+            name: true,
+            manufacturer: { select: { name: true, id: true } },
+          },
         });
 
         const instituteInfo = await prisma.users.findUnique({
