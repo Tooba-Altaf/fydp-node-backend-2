@@ -135,6 +135,7 @@ const createDispatchVaccine = async (req, res) => {
         vaccine_id: item.vaccine_id,
         batch_id: batch_id,
         institute_id: institute_id,
+        request_date: Date().toString(),
       });
     }
   });
@@ -144,7 +145,7 @@ const createDispatchVaccine = async (req, res) => {
       const vaccines = await prisma.dispatch.createMany({
         data: vaccinesToInsert,
       });
-      res.status(StatusCodes.CREATED).send({ data: vaccines });
+      res.status(StatusCodes.CREATED).send({ data: "Success" });
     } else {
       throw new CustomError.CustomAPIError("Something went wrong");
     }
@@ -162,9 +163,9 @@ const changeDispatchStatus = async (req, res) => {
   const data = {};
 
   if (status == DispatchStatus.DISPATCH) {
-    data.dispatch_date = new Date();
+    data.dispatch_date = new Date().toString();
   } else if (status == DispatchStatus.RECEIVED) {
-    data.receive_date = new Date();
+    data.receive_date = new Date().toString();
   }
   if (batch_id) {
     data.batch_id = batch_id;
@@ -182,7 +183,7 @@ const changeDispatchStatus = async (req, res) => {
     );
   }
 
-  res.status(StatusCodes.OK).send({ data: vaccine });
+  res.status(StatusCodes.OK).send({ data: "Status updated successfully" });
 };
 
 const getDispatchVaccines = async (req, res) => {
@@ -206,9 +207,9 @@ const getDispatchVaccines = async (req, res) => {
         "batch_id",
         "vaccine_id",
         "institute_id",
-        // "request_date",
-        // "dispatch_date",
-        // "receive_date",
+        "request_date",
+        "dispatch_date",
+        "receive_date",
       ],
       where: whereClause,
       _count: {
@@ -238,9 +239,9 @@ const getDispatchVaccines = async (req, res) => {
           vaccineInfo: vaccineInfo,
           instituteName: instituteInfo?.name || null,
           count: v._count.vaccine_id,
-          // request_date: v.request_date || null,
-          // dispatch_date: v.dispatch_date || null,
-          // receive_date: v.receive_date || null,
+          request_date: v.request_date || null,
+          dispatch_date: v.dispatch_date || null,
+          receive_date: v.receive_date || null,
         };
       })
     );
@@ -255,9 +256,9 @@ const getDispatchVaccines = async (req, res) => {
         vaccineInfo,
         instituteName,
         count,
-        // request_date,
-        // dispatch_date,
-        // receive_date,
+        request_date,
+        dispatch_date,
+        receive_date,
       } = item;
 
       if (!formattedData[batch_id]) {
@@ -265,9 +266,9 @@ const getDispatchVaccines = async (req, res) => {
           batch_id: batch_id,
           institute_id: institute_id,
           instituteName: instituteName,
-          // request_date,
-          // dispatch_date,
-          // receive_date,
+          request_date,
+          dispatch_date,
+          receive_date,
           vaccines: [],
         };
       }
