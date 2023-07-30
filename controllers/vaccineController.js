@@ -170,7 +170,7 @@ const changeDispatchStatus = async (req, res) => {
     data.batch_id = batch_id;
   }
 
-  const vaccine = await prisma.dispatch.update({
+  const vaccine = await prisma.dispatch.updateMany({
     where: {
       batch_id: batch_id,
     },
