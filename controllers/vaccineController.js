@@ -1,4 +1,4 @@
-const { PrismaClient, UserType } = require("@prisma/client");
+const { PrismaClient, UserType, DispatchStatus } = require("@prisma/client");
 const { StatusCodes } = require("http-status-codes");
 const { v4: uuidv4 } = require("uuid");
 
@@ -155,13 +155,26 @@ const createDispatchVaccine = async (req, res) => {
 
 const changeDispatchStatus = async (req, res) => {
   const { status, batch_id } = req.body;
+
+  if (!status || !batch_id) {
+    throw new CustomError.BadRequestError("Please provide all required fields");
+  }
+  const data = {};
+
+  if (status == DispatchStatus.DISPATCH) {
+    data.dispatch_date = new Date();
+  } else if (status == DispatchStatus.RECEIVED) {
+    data.receive_date = new Date();
+  }
+  if (batch_id) {
+    data.batch_id = batch_id;
+  }
+
   const vaccine = await prisma.dispatch.update({
     where: {
       batch_id: batch_id,
     },
-    data: {
-      status: status,
-    },
+    data: data,
   });
   if (!vaccine) {
     throw new CustomError.NotFoundError(
@@ -173,7 +186,7 @@ const changeDispatchStatus = async (req, res) => {
 };
 
 const getDispatchVaccines = async (req, res) => {
-  const { manufacturer_id, institute_id } = req.query;
+  const { manufacturer_id, institute_id, status } = req.query;
 
   let whereClause = {};
   if (parseInt(manufacturer_id)) {
@@ -184,7 +197,9 @@ const getDispatchVaccines = async (req, res) => {
   if (parseInt(institute_id)) {
     whereClause.institute_id = institute_id;
   }
-
+  if (status) {
+    whereClause.status = status;
+  }
   try {
     const vaccines = await prisma.dispatch.groupBy({
       by: ["batch_id", "vaccine_id", "institute_id"],
