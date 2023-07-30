@@ -160,12 +160,14 @@ const changeDispatchStatus = async (req, res) => {
   if (!status || !batch_id) {
     throw new CustomError.BadRequestError("Please provide all required fields");
   }
-  const data = {};
+  let data = {};
 
   if (status == DispatchStatus.DISPATCH) {
     data.dispatch_date = new Date().toString();
+    data.status = DispatchStatus.DISPATCH;
   } else if (status == DispatchStatus.RECEIVED) {
     data.receive_date = new Date().toString();
+    data.status = DispatchStatus.RECEIVED;
   }
   if (batch_id) {
     data.batch_id = batch_id;
