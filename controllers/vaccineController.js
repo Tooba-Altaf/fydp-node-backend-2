@@ -173,15 +173,16 @@ const changeDispatchStatus = async (req, res) => {
 };
 
 const getDispatchVaccines = async (req, res) => {
-  const { id } = req.user;
-  const { institute_id } = req.params;
+  const { manufacturer_id, institute_id } = req.query;
 
   let whereClause = {};
-  if (type === UserType.INSTITUTE) {
-    whereClause.institute_id = parseInt(id);
+  if (parseInt(manufacturer_id)) {
+    whereClause.vaccine = {
+      manufacturer_id: parseInt(manufacturer_id),
+    };
   }
-  if (institute_id) {
-    whereClause.institute_id = parseInt(institute_id);
+  if (parseInt(institute_id)) {
+    whereClause.institute_id = institute_id;
   }
 
   try {
@@ -198,7 +199,7 @@ const getDispatchVaccines = async (req, res) => {
       vaccines.map(async (v) => {
         const vaccineInfo = await prisma.vaccine.findUnique({
           where: { id: v.vaccine_id },
-          select: { name: true },
+          select: { name: true, manufacturer: true },
         });
 
         const instituteInfo = await prisma.users.findUnique({
@@ -210,7 +211,7 @@ const getDispatchVaccines = async (req, res) => {
           batch_id: v.batch_id,
           vaccine_id: v.vaccine_id,
           institute_id: v.institute_id,
-          vaccineName: vaccineInfo?.name || null,
+          vaccineInfo: vaccineInfo,
           instituteName: instituteInfo?.name || null,
           count: v._count.vaccine_id, // The count for each vaccine_id
         };
@@ -224,7 +225,7 @@ const getDispatchVaccines = async (req, res) => {
         batch_id,
         vaccine_id,
         institute_id,
-        vaccineName,
+        vaccineInfo,
         instituteName,
         count,
       } = item;
@@ -240,8 +241,8 @@ const getDispatchVaccines = async (req, res) => {
 
       formattedData[batch_id].vaccines.push({
         vaccine_id: vaccine_id,
-        vaccineName: vaccineName,
         count: count,
+        vaccineInfo: vaccineInfo,
       });
     });
 

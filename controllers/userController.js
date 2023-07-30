@@ -255,7 +255,7 @@ const changeStatus = async (req, res) => {
 
 const updateProfile = async (req, res) => {
   const { email } = req.user;
-  const { contact, gender, date_of_birth, location, license } = req.body;
+  const { contact, gender, date_of_birth, location, license, cnic } = req.body;
   const updateData = {};
   if (contact) {
     updateData.contact = contact;
@@ -272,7 +272,9 @@ const updateProfile = async (req, res) => {
   if (license) {
     updateData.license = license;
   }
-
+  if (cnic) {
+    updateData.cnic = cnic;
+  }
   try {
     const user = await prisma.users.update({
       where: {
