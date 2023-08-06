@@ -123,6 +123,7 @@ const changeVaccineStatus = async (req, res) => {
 };
 
 const createDispatchVaccine = async (req, res) => {
+  //have to enter  condition that only approved vaccines can be dispatched
   const { vaccines = [] } = req.body;
   const { id: institute_id } = req.user;
   const batch_id = uuidv4();
@@ -288,6 +289,7 @@ const getDispatchVaccines = async (req, res) => {
   } catch (error) {
     throw new CustomError.CustomAPIError(error);
   }
+  res.status(StatusCodes.OK).send({ data: vaccine });
 };
 
 module.exports = {

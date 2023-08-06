@@ -85,16 +85,6 @@ model vaccine {
   dispatch dispatch[]
 }
 
-model civilian {
-  id            Int        @id @default(autoincrement())
-  cnic          String
-  name          String
-  date_of_birth DateTime?
-  gender        Gender
-  contact       String
-  dispatch      dispatch[]
-}
-
 model dispatch {
   id           Int            @id @default(autoincrement())
   vaccine      vaccine        @relation(fields: [vaccine_id], references: [id])
@@ -110,5 +100,12 @@ model dispatch {
     receive_date       String?     
 }
 
-
-
+model civilian {
+  id            Int        @id @default(autoincrement())
+  cnic          String     @unique
+  name          String
+  date_of_birth DateTime?
+  gender        Gender
+  contact       String
+  dispatch      dispatch[]
+}

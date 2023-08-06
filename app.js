@@ -8,6 +8,7 @@ const cors = require("cors");
 const authRouter = require("./routes/authRoutes");
 const userRouter = require("./routes/userRoutes");
 const vaccineRouter = require("./routes/vaccineRoutes");
+const civilianRouter = require("./routes/civilianRoutes");
 
 const client = require("./config/database");
 
@@ -23,6 +24,7 @@ app.use(cookieParser());
 
 //Define Routes
 app.use("/auth", authRouter);
+app.use("/civilian", civilianRouter);
 app.use("/user", authenticateUser, userRouter);
 app.use("/vaccine", authenticateUser, vaccineRouter);
 
