@@ -95,9 +95,9 @@ model dispatch {
   civilian_id  Int?
   institute    users          @relation(fields: [institute_id], references: [id])
   institute_id Int
-    request_date       String?    
-    dispatch_date       String?      
-    receive_date       String?     
+    request_date      DateTime      @default(now())
+    dispatch_date       DateTime?      
+    receive_date       DateTime?     
 }
 
 model civilian {

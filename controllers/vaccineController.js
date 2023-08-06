@@ -136,7 +136,6 @@ const createDispatchVaccine = async (req, res) => {
         vaccine_id: item.vaccine_id,
         batch_id: batch_id,
         institute_id: institute_id,
-        request_date: Date().toString(),
       });
     }
   });
@@ -164,10 +163,10 @@ const changeDispatchStatus = async (req, res) => {
   let data = {};
 
   if (status == DispatchStatus.DISPATCH) {
-    data.dispatch_date = new Date().toString();
+    data.dispatch_date = new Date();
     data.status = DispatchStatus.DISPATCH;
   } else if (status == DispatchStatus.RECEIVED) {
-    data.receive_date = new Date().toString();
+    data.receive_date = new Date();
     data.status = DispatchStatus.RECEIVED;
   }
   if (batch_id) {
@@ -190,9 +189,18 @@ const changeDispatchStatus = async (req, res) => {
 };
 
 const getDispatchVaccines = async (req, res) => {
-  const { manufacturer_id, institute_id, status } = req.query;
+  const {
+    manufacturer_id,
+    institute_id,
+    status,
+    limit = 10,
+    page = 1,
+    direction = "DESC",
+  } = req.query;
 
   let whereClause = {};
+  let column = "request_date";
+
   if (parseInt(manufacturer_id)) {
     whereClause.vaccine = {
       manufacturer_id: parseInt(manufacturer_id),
@@ -203,8 +211,25 @@ const getDispatchVaccines = async (req, res) => {
   }
   if (status) {
     whereClause.status = status;
+    if (status == DispatchStatus.RECEIVED) {
+      column = "receive_date";
+    } else if (status == DispatchStatus.DISPATCH) {
+      column = "dispatch_date";
+    }
   }
   try {
+    const totalCount = await prisma.dispatch.groupBy({
+      by: [
+        "batch_id",
+        "vaccine_id",
+        "institute_id",
+        "request_date",
+        "dispatch_date",
+        "receive_date",
+      ],
+      where: whereClause,
+    });
+
     const vaccines = await prisma.dispatch.groupBy({
       by: [
         "batch_id",
@@ -218,6 +243,13 @@ const getDispatchVaccines = async (req, res) => {
       _count: {
         vaccine_id: true,
       },
+      orderBy: [
+        {
+          [column]: direction?.toUpperCase() === "DESC" ? "desc" : "asc",
+        },
+      ],
+      take: parseInt(limit),
+      skip: (parseInt(page) - 1) * parseInt(limit),
     });
 
     const result = await Promise.all(
@@ -245,11 +277,22 @@ const getDispatchVaccines = async (req, res) => {
           request_date: v.request_date || null,
           dispatch_date: v.dispatch_date || null,
           receive_date: v.receive_date || null,
+          status: v.status || null,
         };
       })
     );
 
     const formattedData = {};
+    const formattedDataCount = {};
+
+    totalCount?.forEach((item) => {
+      const { batch_id } = item;
+      if (!formattedDataCount[batch_id]) {
+        formattedDataCount[batch_id] = {
+          batch_id: batch_id,
+        };
+      }
+    });
 
     result.forEach((item) => {
       const {
@@ -262,6 +305,7 @@ const getDispatchVaccines = async (req, res) => {
         request_date,
         dispatch_date,
         receive_date,
+        status,
       } = item;
 
       if (!formattedData[batch_id]) {
@@ -272,6 +316,7 @@ const getDispatchVaccines = async (req, res) => {
           request_date,
           dispatch_date,
           receive_date,
+          status,
           vaccines: [],
         };
       }
@@ -284,12 +329,14 @@ const getDispatchVaccines = async (req, res) => {
     });
 
     const finalData = Object.values(formattedData);
+    const finalDataCount = Object.values(formattedDataCount);
 
-    res.status(StatusCodes.OK).send({ data: finalData });
+    res
+      .status(StatusCodes.OK)
+      .send({ data: finalData, count: finalDataCount?.length });
   } catch (error) {
     throw new CustomError.CustomAPIError(error);
   }
-  res.status(StatusCodes.OK).send({ data: vaccine });
 };
 
 module.exports = {
