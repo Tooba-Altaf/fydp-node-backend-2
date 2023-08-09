@@ -1,4 +1,9 @@
-const { PrismaClient, UserType, DispatchStatus } = require("@prisma/client");
+const {
+  PrismaClient,
+  UserType,
+  DispatchStatus,
+  VaccineStatus,
+} = require("@prisma/client");
 const { StatusCodes } = require("http-status-codes");
 const { v4: uuidv4 } = require("uuid");
 
@@ -339,6 +344,41 @@ const getDispatchVaccines = async (req, res) => {
   }
 };
 
+const getAvailableVaccines = async (req, res) => {
+  const { id: institute_id } = req.user;
+
+  const vaccines = await prisma.dispatch.groupBy({
+    by: ["vaccine_id"],
+    where: {
+      institute_id: institute_id,
+      status: DispatchStatus.RECEIVED,
+      civilian_id: null,
+    },
+    _count: {
+      vaccine_id: true,
+    },
+  });
+
+  const result = await Promise.all(
+    vaccines.map(async (v) => {
+      const vaccineInfo = await prisma.vaccine.findUnique({
+        where: { id: v.vaccine_id },
+        select: {
+          name: true,
+          manufacturer: { select: { name: true, id: true } },
+        },
+      });
+
+      return {
+        vaccine_id: v.vaccine_id,
+        vaccineInfo: vaccineInfo,
+        count: v._count.vaccine_id,
+      };
+    })
+  );
+
+  res.status(StatusCodes.OK).send({ data: result });
+};
 module.exports = {
   createVaccine,
   getVaccineById,
@@ -347,4 +387,5 @@ module.exports = {
   createDispatchVaccine,
   changeDispatchStatus,
   getDispatchVaccines,
+  getAvailableVaccines,
 };
