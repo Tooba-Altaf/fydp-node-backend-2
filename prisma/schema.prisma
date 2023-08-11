@@ -95,9 +95,12 @@ model dispatch {
   civilian_id  Int?
   institute    users          @relation(fields: [institute_id], references: [id])
   institute_id Int
+  staff    users          @relation(fields: [staff_id], references: [id])
+  staff_id Int?
     request_date      DateTime      @default(now())
     dispatch_date       DateTime?      
     receive_date       DateTime?     
+    vaccination_date DateTime?
 }
 
 model civilian {

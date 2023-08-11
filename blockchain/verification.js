@@ -1,8 +1,6 @@
 const { ethers } = require("ethers");
 const { SHA256 } = require("crypto-js");
 
-const { abi } = require("./contractABI");
-
 class Verification {
   constructor(config, abi) {
     this.config = config;
