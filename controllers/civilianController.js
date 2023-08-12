@@ -111,6 +111,10 @@ const createCivilianVaccineRecord = async (req, res) => {
 const getCivilian = async (req, res) => {
   const { cnic } = req.query;
 
+  if (!cnic) {
+    throw new CustomError.BadRequestError("invalid request");
+  }
+
   const civilianRecord = await prisma.civilian.findUnique({
     where: {
       cnic: cnic,
