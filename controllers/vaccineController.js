@@ -345,7 +345,7 @@ const getDispatchVaccines = async (req, res) => {
 };
 
 const getAvailableVaccines = async (req, res) => {
-  const { id: institute_id } = req.user;
+  const { institute_id } = req.query;
 
   const vaccines = await prisma.dispatch.groupBy({
     by: ["vaccine_id"],
