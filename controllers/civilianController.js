@@ -65,6 +65,10 @@ const createCivilianVaccineRecord = async (req, res) => {
       },
     });
 
+    if (!record?.id) {
+      throw new CustomError.CustomAPIError("Something went wrong");
+    }
+
     try {
       const txHash = await verifier.uploadHash(
         Object.values({
@@ -78,10 +82,7 @@ const createCivilianVaccineRecord = async (req, res) => {
 
       updateDispatch = await prisma.dispatch.update({
         where: {
-          civilian_id: null,
-          status: DispatchStatus.RECEIVED,
-          vaccine_id: vaccine_id,
-          institute_id: institute_id,
+          id: record?.id,
         },
         data: {
           civilian_id: civilian.id,
