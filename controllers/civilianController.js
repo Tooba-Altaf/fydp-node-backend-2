@@ -158,11 +158,15 @@ const getCivilian = async (req, res) => {
 };
 
 const verifyCivilianVaccination = async (req, res) => {
-  const { id: dispatch_record_id } = req.query;
+  const { id: dispatch_record_id } = req.params;
+
+  if (!parseInt(dispatch_record_id)) {
+    throw new CustomError.BadRequestError("invalid request");
+  }
 
   const record = await prisma.dispatch.findUnique({
     where: {
-      id: dispatch_record_id,
+      id: parseInt(dispatch_record_id),
     },
     select: {
       id: true,
@@ -191,12 +195,15 @@ const getCivilians = async (req, res) => {
     limit = 10,
     page = 1,
     direction = "DESC",
-    column = "vaccination_date",
     staff_id,
     institute_id,
   } = req.query;
 
-  let whereClause = {};
+  let whereClause = {
+    civilian_id: {
+      not: null,
+    },
+  };
   if (parseInt(staff_id)) {
     whereClause.staff_id = parseInt(staff_id);
   }
@@ -206,11 +213,11 @@ const getCivilians = async (req, res) => {
 
   const selectClause = {
     id: true,
-    vaccine: (select = { name: true, id: true }),
+    vaccine: { select: { name: true, id: true } },
     batch_id: true,
-    civilian: (select = { name: true, id: true }),
-    institute: (select = { name: true, id: true }),
-    staff: (select = { name: true, id: true }),
+    civilian: { select: { name: true, id: true } },
+    institute: { select: { name: true, id: true } },
+    staff: { select: { name: true, id: true } },
     vaccination_date: true,
   };
   const records = await prisma.dispatch.findMany({
@@ -220,7 +227,7 @@ const getCivilians = async (req, res) => {
     skip: (parseInt(page) - 1) * parseInt(limit),
     orderBy: [
       {
-        [column]: direction?.toUpperCase() === "DESC" ? "desc" : "asc",
+        vaccination_date: direction?.toUpperCase() === "DESC" ? "desc" : "asc",
       },
     ],
   });
