@@ -91,6 +91,9 @@ const login = async (req, res) => {
   if (!user?.email) {
     throw new CustomError.UnauthenticatedError("Invalid Credentials");
   }
+  if (!user?.password) {
+    throw new CustomError.UnauthenticatedError("Setup your password first");
+  }
   const isPasswordCorrect = await bcrypt.compare(password, user?.password);
 
   if (!isPasswordCorrect) {
