@@ -347,10 +347,14 @@ const getDispatchVaccines = async (req, res) => {
 const getAvailableVaccines = async (req, res) => {
   const { institute_id } = req.query;
 
+  if (!parseInt(institute_id)) {
+    throw new CustomError.BadRequestError("invalid request");
+  }
+
   const vaccines = await prisma.dispatch.groupBy({
     by: ["vaccine_id"],
     where: {
-      institute_id: institute_id,
+      institute_id: parseInt(institute_id),
       status: DispatchStatus.RECEIVED,
       civilian_id: null,
     },
