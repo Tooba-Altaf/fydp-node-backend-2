@@ -17,8 +17,8 @@ router.post(
   authorizeRoles(UserType.STAFF),
   createCivilianVaccineRecord
 );
-router.get("/get-civilian", getCivilian);
+router.post("/get-civilian", getCivilian);
 router.get("/get-records", getCivilians);
-router.get("/verify/:id", verifyCivilianVaccination);
+router.post("/verify/:id", verifyCivilianVaccination);
 
 module.exports = router;

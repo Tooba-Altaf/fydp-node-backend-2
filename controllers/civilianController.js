@@ -109,7 +109,7 @@ const createCivilianVaccineRecord = async (req, res) => {
 };
 
 const getCivilian = async (req, res) => {
-  const { cnic } = req.query;
+  const { cnic } = req.body;
 
   if (!cnic) {
     throw new CustomError.BadRequestError("invalid request");
