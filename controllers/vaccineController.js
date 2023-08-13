@@ -361,6 +361,11 @@ const getAvailableVaccines = async (req, res) => {
     _count: {
       vaccine_id: true,
     },
+    orderBy: [
+      {
+        vaccine_id: "desc",
+      },
+    ],
     take: parseInt(limit),
     skip: (parseInt(page) - 1) * parseInt(limit),
   });
