@@ -125,7 +125,7 @@ const getCivilian = async (req, res) => {
   });
 
   if (!civilianRecord) {
-    throw new CustomError.NotFoundError("invalid request");
+    throw new CustomError.NotFoundError("No record found against this CNIC");
   }
 
   const dispatchRecord = await prisma.dispatch.findMany({
