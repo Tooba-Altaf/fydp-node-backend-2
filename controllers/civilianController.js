@@ -218,7 +218,13 @@ const getCivilians = async (req, res) => {
   const selectClause = {
     id: true,
     vaccine: {
-      select: { name: true, id: true, info: true, doses: true },
+      select: {
+        name: true,
+        id: true,
+        info: true,
+        doses: true,
+        manufacturer: { select: { name: true, id: true } },
+      },
     },
     batch_id: true,
     civilian: {
