@@ -345,7 +345,7 @@ const getDispatchVaccines = async (req, res) => {
 };
 
 const getAvailableVaccines = async (req, res) => {
-  const { institute_id } = req.query;
+  const { institute_id, limit = 10, page = 1 } = req.query;
 
   if (!parseInt(institute_id)) {
     throw new CustomError.BadRequestError("invalid request");
@@ -360,6 +360,17 @@ const getAvailableVaccines = async (req, res) => {
     },
     _count: {
       vaccine_id: true,
+    },
+    take: parseInt(limit),
+    skip: (parseInt(page) - 1) * parseInt(limit),
+  });
+
+  const total = await prisma.dispatch.groupBy({
+    by: ["vaccine_id"],
+    where: {
+      institute_id: parseInt(institute_id),
+      status: DispatchStatus.RECEIVED,
+      civilian_id: null,
     },
   });
 
@@ -381,7 +392,7 @@ const getAvailableVaccines = async (req, res) => {
     })
   );
 
-  res.status(StatusCodes.OK).send({ data: result });
+  res.status(StatusCodes.OK).send({ data: result, count: total?.length });
 };
 module.exports = {
   createVaccine,
