@@ -219,7 +219,16 @@ const getCivilians = async (req, res) => {
     id: true,
     vaccine: { select: { name: true, id: true } },
     batch_id: true,
-    civilian: { select: { name: true, id: true } },
+    civilian: {
+      select: {
+        name: true,
+        id: true,
+        cnic: true,
+        date_of_birth: true,
+        gender: true,
+        contact: true,
+      },
+    },
     institute: { select: { name: true, id: true } },
     staff: { select: { name: true, id: true } },
     vaccination_date: true,
