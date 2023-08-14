@@ -172,9 +172,42 @@ const resetPassword = async (req, res) => {
   res.status(StatusCodes.OK).send({ message: "Password updated successfully" });
 };
 
+const changePassword = async (req, res) => {
+  const { password } = req.body;
+  const { email } = req.user;
+
+  if (!password || !email) {
+    throw new CustomError.BadRequestError("Invalid request");
+  }
+
+  const user = await prisma.users.findUnique({
+    where: {
+      email: email,
+    },
+    select: {
+      email: true,
+      id: true,
+    },
+  });
+
+  if (user) {
+    let hashedPassword = await bcrypt.hash(password, 8);
+    const updatedUser = await prisma.users.update({
+      where: { id: user.id },
+      data: {
+        password: hashedPassword,
+      },
+    });
+  } else {
+    throw new CustomError.NotFoundError("User not found");
+  }
+  res.status(StatusCodes.OK).send({ message: "Password updated successfully" });
+};
+
 module.exports = {
   register,
   login,
   forgotPassword,
   resetPassword,
+  changePassword,
 };
