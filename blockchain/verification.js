@@ -57,4 +57,4 @@ class Verification {
   }
 }
 
-module.exports = { Verification };
+module.exports = { Verification }

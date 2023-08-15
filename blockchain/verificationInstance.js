@@ -10,25 +10,5 @@ const config = {
 
 const verifier = new Verification(config, abi);
 
-// Usage
-const dataRow = ["data1", "data2", "data3"];
-
-// verifier
-//   .uploadHash(dataRow, process.env.WALLET_ADDRESS)
-//   .then((txHash) => {
-//     console.log("Transaction Hash:", txHash);
-//   })
-//   .catch((error) => {
-//     console.log("thisis err", error);
-//   });
-
-// verifier
-//   .verifyHash(dataRow)
-//   .then((isVerified) => {
-//     console.log("Is Hash Verified:", isVerified);
-//   })
-//   .catch((error) => {
-//     console.log("thisis err", error);
-//   });
 
 module.exports = { verifier };
